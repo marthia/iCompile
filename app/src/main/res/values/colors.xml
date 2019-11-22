@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#EFEFEF</color>
+    <color name="colorPrimaryDark">#FFFFFF</color>
+    <color name="colorAccent">#DB903D</color>
+
+    <color name="dark_colorPrimary">#646464</color>
+    <color name="dark_colorPrimaryDark">#000000</color>
+    <color name="dark_colorAccent">#66DB903D</color>
+
+    <color name="black">#000</color>
+    <color name="white">#FFF</color>
+    <color name="save_btn_color">#6271C5</color>
+    <color name="save_btn_color_dark">#666271C5</color>
+    <color name="stop_btn_color">#B64545</color>
+    <color name="stop_btn_color_dark">#66B64545</color>
+    <color name="run_btn_color">#46A37E</color>
+    <color name="run_btn_color_dark">#6646A37E</color>
+    <color name="top_bar_background_color">#FFF</color>
+    <color name="top_bar_background_color_dark">#383838</color>
+    <color name="editor_background_color">#F5F5F5</color>
+    <color name="editor_background_color_dark">#646464</color>
+    <color name="editor_hint_color">#E5E5E5</color>
+</resources>
