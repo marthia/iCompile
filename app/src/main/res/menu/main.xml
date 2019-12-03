@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/btn_run"
+        android:icon="@drawable/ic_play_arrow_black_24dp"
+        android:title="@string/btn_run_title"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/btn_stop"
+        android:icon="@drawable/ic_stop_black_24dp"
+        android:title="@string/btn_stop_title"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/btn_save"
+        android:icon="@drawable/ic_save_black_24dp"
+        android:title="@string/btn_save_title"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/btn_search"
+        android:title="@string/btn_find_title"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        android:icon="@drawable/ic_search_black_24dp"
+        app:showAsAction="always" />
+
+</menu>

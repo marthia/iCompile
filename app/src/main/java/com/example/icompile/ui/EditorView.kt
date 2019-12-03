@@ -12,11 +12,6 @@ import com.example.icompile.R
 
 class EditorView : AppCompatEditText {
 
-    private val keywords = arrayOf(
-        "private", "fun", "super", "var", "val", "for", "while", "true", "false",
-        "public", "open", "class", "constructor", "init"
-    )
-
     // using `@JvmOverloads` generates unwanted bugs and styling issues
     constructor(context: Context) : super(context)
 
@@ -45,7 +40,6 @@ class EditorView : AppCompatEditText {
                 attrs,
                 R.styleable.EditorView, defStyleAttr, 0
             )
-
         attributes.recycle()
     }
 
@@ -61,16 +55,6 @@ class EditorView : AppCompatEditText {
             }
             baseline += lineHeight
         }
-
-        /* val listOfTokens = text?.split(" ")
-         if (listOfTokens != null) {
-             for (token in listOfTokens.toTypedArray()) {
-                 for (keyword in keywords)
-                     if (token.equals(keyword)){
-                         textColors.
-                     }
-             }
-         }*/
     }
 
 }
