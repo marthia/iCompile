@@ -49,7 +49,7 @@ class EditorView : AppCompatEditText {
         for (i in 0 until lineCount) {
             paint.let {
                 canvas.drawText(
-                    String.format(" %02d ", i + 1), rect.left.toFloat(),
+                    String.format(" %3d ", i + 1), rect.left.toFloat(),
                     baseline.toFloat(), it
                 )
             }

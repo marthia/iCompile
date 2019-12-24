@@ -16,15 +16,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.example.icompile.R
 import com.example.icompile.core.CoreTextParser
-import com.example.icompile.core.loadTextFromFile
-import com.example.icompile.core.saveTextFile
+import com.example.icompile.data.InjectorUtils
 import com.example.icompile.databinding.ActivityMainBinding
 import com.example.icompile.ui.viewmodel.EditorViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import java.io.File
 
 
 class MainActivity : AppCompatActivity() {
@@ -38,20 +37,28 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding = DataBindingUtil.setContentView(
+            this, R.layout.activity_main
+        )
+
+
         setSupportActionBar(binding.toolbar)
 
-        viewModel = ViewModelProviders.of(this).get(EditorViewModel::class.java)
+        binding.toolbar.setTitleTextAppearance(this, R.style.titleStyle)
+
+
+        val factory = InjectorUtils.provideCodeRepository()
+
+        val viewModel = ViewModelProviders.of(this, factory)
+            .get(EditorViewModel::class.java)
+
+        viewModel.getCode()
+
+        viewModel.codeTextUi.observe(this, Observer {
+            binding.code = it
+        })
 
         parser = CoreTextParser()
-
-        binding.content.append(
-            loadTextFromFile(
-                "${getExternalFilesDir(
-                    null
-                )}/iCompile/main.txt"
-            ).orEmpty()
-        )
 
         parser.setText(binding.content.text.toString())
 
@@ -122,23 +129,7 @@ class MainActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    private fun reloadFromFile(): String {
-        // create our own folder for any file : could be asked from user in future
-        if (!File("${getExternalFilesDir(null)}/iCompile").exists()) {
-            File("${getExternalFilesDir(null)}/iCompile").mkdir()
-        }
 
-        val result = saveTextFile(
-            binding.content.text.toString(),
-            "${getExternalFilesDir(null)}/iCompile/main.txt"
-        )
-
-        // reset to initial state and re-assign the changed text
-        parser.reset()
-        parser.setText(binding.content.text.toString())
-
-        return result
-    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
@@ -173,8 +164,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.btn_save -> {
-                val result = reloadFromFile()
-                Toast.makeText(this, result, Toast.LENGTH_LONG).show()
+//                val result = reloadFromFile()
+//                Toast.makeText(this, result, Toast.LENGTH_LONG).show()
                 true
             }
 
@@ -190,49 +181,49 @@ class MainActivity : AppCompatActivity() {
 
     private fun bindViews() {
 
-       /* binding.content.addTextChangedListener(object : TextWatcher {
+        /* binding.content.addTextChangedListener(object : TextWatcher {
 
 
-            override fun beforeTextChanged(
-                s: CharSequence,
-                start: Int,
-                count: Int,
-                after: Int
-            ) {
-            }
+             override fun beforeTextChanged(
+                 s: CharSequence,
+                 start: Int,
+                 count: Int,
+                 after: Int
+             ) {
+             }
 
-            override fun onTextChanged(
-                s: CharSequence,
-                start: Int,
-                before: Int,
-                count: Int
-            ) {
-            }
-
-
-            override fun afterTextChanged(s: Editable) {
-
-                var offset = 0
-                val text = binding.content.text
-
-                while ( text != null && offset < text.length) {
-                    RESERVED.forEach {
-                        val index = text.indexOf(it, offset)
-                        if (index != -1) {
-                            text.setSpan(
-                                ForegroundColorSpan(Color.parseColor("#3b78e7")),
-                                index,
-                                index + it.length,
-                                Spannable.SPAN_INTERMEDIATE
-                            )
-                        }
-                    }
+             override fun onTextChanged(
+                 s: CharSequence,
+                 start: Int,
+                 before: Int,
+                 count: Int
+             ) {
+             }
 
 
+             override fun afterTextChanged(s: Editable) {
 
-                        offset++
-                }
-               */
+                 var offset = 0
+                 val text = binding.content.text
+
+                 while ( text != null && offset < text.length) {
+                     RESERVED.forEach {
+                         val index = text.indexOf(it, offset)
+                         if (index != -1) {
+                             text.setSpan(
+                                 ForegroundColorSpan(Color.parseColor("#3b78e7")),
+                                 index,
+                                 index + it.length,
+                                 Spannable.SPAN_INTERMEDIATE
+                             )
+                         }
+                     }
+
+
+
+                         offset++
+                 }
+                */
 
         /* val index = s.toString().indexOf(COMMENT)
                 if (index != -1) {

@@ -48,4 +48,9 @@
         <item name="android:windowIsFloating">true</item>
     </style>
 
+    <style name="titleStyle">
+        <item name="android:fontFamily">@font/aller_display</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
 </resources>

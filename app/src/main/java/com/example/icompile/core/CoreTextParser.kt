@@ -3,14 +3,15 @@ package com.example.icompile.core
 import android.graphics.Point
 import kotlin.properties.Delegates
 
-class CoreTextParser {
+open class CoreTextParser {
     var isError = false
     private lateinit var text: String
     private var position by Delegates.notNull<Int>()
     private var newPos by Delegates.notNull<Int>()
     private lateinit var location: Point
+    private val decisionHelper = DecisionHelper()
 
-    private fun String.abortSyntax(): String {
+    fun String.abortSyntax(): String {
 
         isError = true
 
@@ -63,61 +64,35 @@ class CoreTextParser {
         return stringBuilder.toString()
     }
 
-    private fun skipUnread(): String {
-        var p = position
-        var state = 0
+    fun getKeywordAt(list: List<String>): Int {
+        var i = 0
+        var keyword: String
 
-        loop@ while (p < text.lastIndex) {
-            when (state) {
-                0 -> {
-                    state = when {
-                        text[p] == '/' -> 1
-                        text[p].isWhitespace() -> 0
-                        else -> break@loop
-                    }
-                }
+        skipBlanks()
 
-                1 -> {
-                    state = when {
-                        text[p] == '*' -> 2
-                        text[p] == '/' -> 4
-                        else -> break@loop
+        while (i < list.lastIndex) {
+            keyword = if (list[i][1] == '#')
+                list[i]
+            else
+                list[i]
 
-                    }
-                }
-                2 -> {
-                    state = when {
-                        (text[p] == '*') -> 3
-                        else -> 2
-                    }
-                }
-                3 -> {
-                    state = when {
-                        text[p] == '*' -> 3
-                        text[p] == '/' -> 0
-                        else -> 2
-                    }
-                }
-                4 -> {
-                    state = when {
-                        text[p].toString() == "\n" -> 0
-                        else -> 4
-                    }
-                }
+            when {
+                (keyword == "str") and isStr() -> return i
+                (keyword == "id") and isId() -> return i
+                (keyword == "int") and isInt() -> return i
+                (keyword == "float") and isInt() -> return i
             }
-            p++
+            i++
         }
-        return when (state) {
-            0 -> jumpTo(p)
-            1 -> jumpTo(p - 1)
-            else -> "Invalid Comment".abortSyntax()
-        }
+        return -1
     }
 
+    // check if the character(s) at current position is
+    // either of these main groups
     private fun isInt(): Boolean {
 
         // skip all comments and whitespaces first
-        skipUnread()
+        skipBlanks()
 
         var p = position
         var state = 0
@@ -151,14 +126,9 @@ class CoreTextParser {
         return state == 2
     }
 
-    fun skipInt(): String {
-        return if (isInt()) jumpTo(newPos)
-        else "Invalid Int".abortSyntax()
-    }
-
     private fun isFloat(): Boolean {
         // skip all comments and whitespaces first
-        skipUnread()
+        skipBlanks()
 
         var p = position
         var state = 0
@@ -228,19 +198,12 @@ class CoreTextParser {
         return state == 2 or 4 or 7
     }
 
-    fun skipFloat(): String {
-        return if (isFloat())
-            jumpTo(newPos)
-        else
-            "invalid float".abortSyntax()
-    }
-
     private fun isId(): Boolean {
         var p = position
         var state = 0
 
         // skip all comments and whitespaces first
-        skipUnread()
+        skipBlanks()
 
         loop@ while (p < text.lastIndex) {
             when (state) {
@@ -264,17 +227,12 @@ class CoreTextParser {
         return state == 1
     }
 
-    fun skipId(): String {
-        return if (isId()) return jumpTo(newPos)
-        else "Invalid Id".abortSyntax()
-    }
-
     private fun isStr(): Boolean {
         var p = position
         var state = 0
 
         // skip all comments and whitespaces first
-        skipUnread()
+        skipBlanks()
 
         loop@ while (p < text.lastIndex) {
             when (state) {
@@ -322,46 +280,98 @@ class CoreTextParser {
         return state == 2 or 4
     }
 
+    fun isKeyword(keyword: String): Boolean {
+        skipBlanks()
+
+        newPos = position + keyword.length
+        return text.slice(IntRange(position, keyword.length)) == keyword
+    }
+    // end of checks
+
+    // get item and move position to the beginning of
+    // the next item
+    fun skipInt(): String {
+        return if (isInt()) jumpTo(newPos)
+        else "Invalid Int".abortSyntax()
+    }
+
+    fun skipFloat(): String {
+        return if (isFloat())
+            jumpTo(newPos)
+        else
+            "invalid float".abortSyntax()
+    }
+
+    fun skipId(): String {
+        return if (isId()) return jumpTo(newPos)
+        else "Invalid Id".abortSyntax()
+    }
+
     fun skipStr(): String {
         return if (isStr()) jumpTo(newPos)
         else
             "Invalid Int".abortSyntax()
     }
 
-    private fun isKeyword(keyword: String): Boolean {
-        skipUnread()
-
-        newPos = position + keyword.length
-        return text.slice(IntRange(position, keyword.length)) == keyword
-    }
-
-    fun skipKeyword(keyword: String): String {
+    internal fun skipKeyword(keyword: String): String {
         return if (isKeyword(keyword)) {
             jumpTo(newPos)
         } else "$keyword is expected".abortSyntax()
     }
 
-    fun getKeywordAt(list: List<String>): Int {
-        var i = 0
-        var keyword: String
+    private fun skipBlanks(): String {
+        var p = position
+        var state = 0
 
-        skipUnread()
+        loop@ while (p < text.lastIndex) {
+            when (state) {
+                0 -> {
+                    state = when {
+                        text[p] == '/' -> 1
+                        text[p].isWhitespace() -> 0
+                        else -> break@loop
+                    }
+                }
 
-        while (i < list.lastIndex) {
-            keyword = if (list[i][1] == '#')
-                list[i]
-            else
-                list[i]
+                1 -> {
+                    state = when {
+                        text[p] == '*' -> 2
+                        text[p] == '/' -> 4
+                        else -> break@loop
 
-            when {
-                (keyword == "str") and isStr() -> return i
-                (keyword == "id") and isId() -> return i
-                (keyword == "int") and isInt() -> return i
-                (keyword == "float") and isInt() -> return i
+                    }
+                }
+                2 -> {
+                    state = when {
+                        (text[p] == '*') -> 3
+                        else -> 2
+                    }
+                }
+                3 -> {
+                    state = when {
+                        text[p] == '*' -> 3
+                        text[p] == '/' -> 0
+                        else -> 2
+                    }
+                }
+                4 -> {
+                    state = when {
+                        text[p].toString() == "\n" -> 0
+                        else -> 4
+                    }
+                }
             }
-            i++
+            p++
         }
-        return -1
+        return when (state) {
+            0 -> jumpTo(p)
+            1 -> jumpTo(p - 1)
+            else -> "Invalid Comment".abortSyntax()
+        }
     }
+    // end of skips
 
+    fun skipRegEx() {
+        decisionHelper.skipOrs()
+    }
 }
