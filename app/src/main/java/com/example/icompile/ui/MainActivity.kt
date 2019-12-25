@@ -19,7 +19,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.example.icompile.R
-import com.example.icompile.core.CoreTextParser
+import com.example.icompile.core.Scanner
 import com.example.icompile.data.InjectorUtils
 import com.example.icompile.databinding.ActivityMainBinding
 import com.example.icompile.ui.viewmodel.EditorViewModel
@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var onCloseListener: SearchView.OnCloseListener
     private lateinit var queryTextListener: SearchView.OnQueryTextListener
     private lateinit var viewModel: EditorViewModel
-    private lateinit var parser: CoreTextParser
+    private lateinit var parser: Scanner
     lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,30 +44,35 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.toolbar)
 
-        binding.toolbar.setTitleTextAppearance(this, R.style.titleStyle)
+        bindViews()
 
+
+        binding.toolbar.setTitleTextAppearance(this, R.style.titleStyle)
 
         val factory = InjectorUtils.provideCodeRepository()
 
-        val viewModel = ViewModelProviders.of(this, factory)
+        viewModel = ViewModelProviders.of(this, factory)
             .get(EditorViewModel::class.java)
 
-        viewModel.getCode()
-
-        viewModel.codeTextUi.observe(this, Observer {
-            binding.code = it
-        })
-
-        parser = CoreTextParser()
-
-        parser.setText(binding.content.text.toString())
-
-        bindViews()
-
+        bindData()
 //        viewModel.bottomShortCut.observe(this, Observer { isVisible ->
 //            isVisible.let { binding.keyboardShortcut = it }
 //        })
 
+    }
+
+    private fun bindData() {
+
+        parser = Scanner()
+
+        viewModel.codeTextUi.observe(this, Observer {
+            it?.let { text ->
+                binding.code = text
+                parser.setText(text)
+            }
+        })
+
+        viewModel.getCode()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -130,7 +135,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         return when (item.itemId) {
@@ -164,8 +168,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.btn_save -> {
-//                val result = reloadFromFile()
-//                Toast.makeText(this, result, Toast.LENGTH_LONG).show()
+                viewModel.setCode(binding.content.text.toString())
+                Toast.makeText(this, "Successfully saved!", Toast.LENGTH_LONG).show()
                 true
             }
 

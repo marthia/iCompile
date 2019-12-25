@@ -8,11 +8,10 @@ import java.io.File
 
 class CodeRepository() {
 
-
     fun getCode(): Observable<String> {
 
         val code = loadTextFromFile(
-            "${Environment.getRootDirectory()}${CODE_TEXT_FOLDER_PATH}${CODE_TEXT_FILE}"
+            FULL_PATH
         ).orEmpty()
 
         return Observable.just(code)
@@ -21,14 +20,14 @@ class CodeRepository() {
 
     fun saveCode(text: String): String {
         // create our own folder for any file : could be asked from user in future
-        if (!File("${Environment.getRootDirectory()}${CODE_TEXT_FOLDER_PATH}").exists()) {
-            File("${Environment.getRootDirectory()}${CODE_TEXT_FOLDER_PATH}${CODE_TEXT_FILE}")
+        if (!File("${Environment.getExternalStorageDirectory()}${CODE_TEXT_FOLDER_PATH}").exists()) {
+            File(FULL_PATH)
                 .mkdir()
         }
 
         return saveTextFile(
             text,
-            "${Environment.getRootDirectory()}"
+            FULL_PATH
         )
     }
 
@@ -36,6 +35,8 @@ class CodeRepository() {
 
         private const val CODE_TEXT_FILE = "/main.txt"
         private const val CODE_TEXT_FOLDER_PATH = "/iCompile"
+        private var FULL_PATH =
+            "${Environment.getExternalStorageDirectory()}${CODE_TEXT_FOLDER_PATH}${CODE_TEXT_FILE}"
         // For Singleton instantiation
         @Volatile
         private var instance: CodeRepository? = null

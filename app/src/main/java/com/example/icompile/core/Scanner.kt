@@ -3,19 +3,18 @@ package com.example.icompile.core
 import android.graphics.Point
 import kotlin.properties.Delegates
 
-open class CoreTextParser {
+open class Scanner {
     var isError = false
     private lateinit var text: String
     private var position by Delegates.notNull<Int>()
     private var newPos by Delegates.notNull<Int>()
     private lateinit var location: Point
-    private val decisionHelper = DecisionHelper()
 
-    fun String.abortSyntax(): String {
+    fun abortSyntax(s: String): String {
 
         isError = true
 
-        return "$this \n" +
+        return "$s \n" +
                 "Line = ${currentLine()} \n" +
                 "Character = ${text[position]} \n " +
                 "at position ${location.x} , ${location.y}"
@@ -64,7 +63,7 @@ open class CoreTextParser {
         return stringBuilder.toString()
     }
 
-    fun getKeywordAt(list: List<String>): Int {
+    fun getTokenInList(list: List<String>): Int {
         var i = 0
         var keyword: String
 
@@ -292,31 +291,31 @@ open class CoreTextParser {
     // the next item
     fun skipInt(): String {
         return if (isInt()) jumpTo(newPos)
-        else "Invalid Int".abortSyntax()
+        else abortSyntax("Invalid Int")
     }
 
     fun skipFloat(): String {
         return if (isFloat())
             jumpTo(newPos)
         else
-            "invalid float".abortSyntax()
+            abortSyntax("invalid float")
     }
 
     fun skipId(): String {
         return if (isId()) return jumpTo(newPos)
-        else "Invalid Id".abortSyntax()
+        else abortSyntax("Invalid Id")
     }
 
     fun skipStr(): String {
         return if (isStr()) jumpTo(newPos)
         else
-            "Invalid Int".abortSyntax()
+            abortSyntax("Invalid Int")
     }
 
-    internal fun skipKeyword(keyword: String): String {
+    internal fun getToken(keyword: String): String {
         return if (isKeyword(keyword)) {
             jumpTo(newPos)
-        } else "$keyword is expected".abortSyntax()
+        } else abortSyntax("$keyword is expected")
     }
 
     private fun skipBlanks(): String {
@@ -366,12 +365,12 @@ open class CoreTextParser {
         return when (state) {
             0 -> jumpTo(p)
             1 -> jumpTo(p - 1)
-            else -> "Invalid Comment".abortSyntax()
+            else -> abortSyntax("Invalid Comment")
         }
     }
     // end of skips
 
-    fun skipRegEx() {
-        decisionHelper.skipOrs()
-    }
+//    fun skipRegEx() {
+//        decisionHelper.skipOrs()
+//    }
 }

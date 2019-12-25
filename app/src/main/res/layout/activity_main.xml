@@ -73,7 +73,7 @@
                         android:elevation="1dp"
                         android:fontFamily="@font/inconsolata_regular"
                         android:hint="@string/editor_hint"
-                        android:text="@={code}"
+                        android:text="@{code}"
                         android:imeOptions="flagNoFullscreen|flagNoPersonalizedLearning|flagNoEnterAction"
                         android:includeFontPadding="true"
                         android:inputType="textMultiLine|textNoSuggestions"
