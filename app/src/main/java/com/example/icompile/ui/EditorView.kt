@@ -9,7 +9,6 @@ import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatEditText
 import com.example.icompile.R
 
-
 class EditorView : AppCompatEditText {
 
     // using `@JvmOverloads` generates unwanted bugs and styling issues
@@ -25,12 +24,24 @@ class EditorView : AppCompatEditText {
         init(context, attrs, defStyleAttr)
     }
 
+    private var editorWrapView = false
+    private val mLineBounds = Rect()
+    private val mPaintHighlight = Paint().apply {
+        isAntiAlias = false
+        style = Paint.Style.FILL
+        color = Color.parseColor("#24A81A50")
+    }
+    private var mHighlightedLine = -1
+    private var mHighlightStart = -1
+
     private val rect = Rect()
     private val paint: Paint = Paint().apply {
         isAntiAlias = true
         style = Paint.Style.FILL
-        color = Color.GRAY
-        textSize = resources.getDimensionPixelSize(R.dimen.editor_line_number_text_size).toFloat()
+        color = Color.parseColor("#646464")
+        textSize =
+            resources.getDimensionPixelSize(R.dimen.editor_line_number_text_size)
+                .toFloat()
     }
 
     private fun init(context: Context, attrs: AttributeSet?, defStyleAttr: Int) {
@@ -40,12 +51,21 @@ class EditorView : AppCompatEditText {
                 attrs,
                 R.styleable.EditorView, defStyleAttr, 0
             )
+        // is the view wrapped
+        editorWrapView =
+            attributes.getBoolean(R.styleable.EditorView_editor_wrap_text, false)
+
         attributes.recycle()
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+
+
         var baseline = baseline
+
+        computeLineHighlight()
+
         for (i in 0 until lineCount) {
             paint.let {
                 canvas.drawText(
@@ -53,7 +73,47 @@ class EditorView : AppCompatEditText {
                     baseline.toFloat(), it
                 )
             }
+            if ((i == mHighlightedLine)) {
+                getLineBounds(mHighlightedLine, mLineBounds)
+                mLineBounds.left = 0 // make sure the whole gets highlighted
+                canvas.drawRect(mLineBounds, mPaintHighlight);
+            }
+
             baseline += lineHeight
+        }
+
+    }
+
+    /**
+     * Compute the line to highlight based on selection
+     */
+    private fun computeLineHighlight() {
+        var i: Int
+        var line: Int
+        val selStart: Int = selectionStart
+        val text: String
+
+        if (!isEnabled) {
+            return
+        }
+
+        if (mHighlightStart != selStart) {
+            text = getText()!!.toString()
+
+            i = 0
+            line = i
+            while (i < selStart) {
+                i = text.indexOf("\n", i)
+                if (i < 0) {
+                    break
+                }
+                if (i < selStart) {
+                    ++line
+                }
+                ++i
+            }
+
+            mHighlightedLine = line
         }
     }
 

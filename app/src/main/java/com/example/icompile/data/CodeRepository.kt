@@ -21,8 +21,12 @@ class CodeRepository() {
     fun saveCode(text: String): String {
         // create our own folder for any file : could be asked from user in future
         if (!File("${Environment.getExternalStorageDirectory()}${CODE_TEXT_FOLDER_PATH}").exists()) {
-            File(FULL_PATH)
-                .mkdir()
+
+
+            if (File("${Environment.getExternalStorageDirectory()}${CODE_TEXT_FOLDER_PATH}")
+                    .mkdir()
+            )
+                File(FULL_PATH).createNewFile()
         }
 
         return saveTextFile(

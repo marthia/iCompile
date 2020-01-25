@@ -5,20 +5,20 @@ class Parser(
 ) {
 
     fun execute() {
-        val e = Expression()
-        e.execute(scanner)
+        val e = Expression(scanner)
+        e.skipComp()
     }
 
-    class Expression {
-
-        lateinit var scanner: Scanner
+    class Expression(
+        private val scanner: Scanner
+    ) {
 
         fun skipComp() {
             skipAdds()
             skipComp1()
         }
 
-        fun skipComp1(): Boolean {
+        private fun skipComp1(): Boolean {
             return when (scanner.getTokenInList(listOf("<=", ">=", "<>", "<", "=", ">"))) {
                 0 -> {
                     scanner.getToken("<=")
@@ -55,14 +55,12 @@ class Parser(
             }
         }
 
-
-        fun skipAdds() {
+        private fun skipAdds() {
             skipMuls()
             skipAdds1()
         }
 
-
-        fun skipAdds1(): Boolean {
+        private fun skipAdds1(): Boolean {
             return when (scanner.getTokenInList(listOf("+", "-", "or"))) {
                 0 -> {
                     scanner.getToken("+");
@@ -86,36 +84,38 @@ class Parser(
             }
         }
 
-        fun skipMuls() {
+        private fun skipMuls() {
             skipPrimary()
             skipMuls1()
         }
 
-        fun skipMuls1(): Boolean {
-            return when (scanner.getTokenInList(listOf("*", "/", "and"))) {
+        private fun skipMuls1(): Boolean {
+            val result: Boolean
+            when (scanner.getTokenInList(listOf("*", "/", "and"))) {
                 0 -> {
                     scanner.getToken("*");
                     skipPrimary()
-                    true
+                    result = true
                     skipMuls1()
                 }
                 1 -> {
                     scanner.getToken("/");
                     skipPrimary()
-                    true
+                    result = true
                     skipMuls1()
                 }
                 2 -> {
                     scanner.getToken("and")
                     skipPrimary()
-                    true
+                    result = true
                     skipMuls1()
                 }
-                else -> false// nothing
+                else -> result = true// nothing
             }
+            return result
         }
 
-        fun skipPrimary(): Boolean {
+        private fun skipPrimary(): Boolean {
             return when (scanner.getTokenInList(listOf("not", "-", "(", "#id", "#str", "#float"))) {
                 0 -> {
                     scanner.getToken("not");
@@ -142,12 +142,6 @@ class Parser(
                     false
                 }
             }
-        }
-
-
-        fun execute(scanner: Scanner) {
-            this.scanner = scanner
-            skipComp()
         }
     }
 }

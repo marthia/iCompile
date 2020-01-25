@@ -2,7 +2,7 @@
     <string name="app_name">iCompile</string>
     <string name="editor_hint">Write your code here</string>
     <string name="dummy_text">
-        Fully customized components can be used to create graphical components that appear however you wish. <b/> Perhaps a graphical VU meter that looks like an old analog gauge, or a sing-a-long text view where</string>
+        Fully customized components can be used to create graphical components that appear however you wish. <b /> Perhaps a graphical VU meter that looks like an old analog gauge, or a sing-a-long text view where</string>
     <string name="btn_save_title">save changes</string>
     <string name="btn_stop_title">stop</string>
     <string name="btn_run_title">run application</string>

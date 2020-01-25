@@ -3,6 +3,7 @@ package com.example.icompile.core
 import android.graphics.Point
 import kotlin.properties.Delegates
 
+
 open class Scanner {
     var isError = false
     private lateinit var text: String
@@ -40,12 +41,14 @@ open class Scanner {
         location = Point(0, 0)
     }
 
+
+    // get text at current line
     private fun currentLine(): String {
-        val split = text.split("\n")
-        return split[location.x]
+        val lines = text.split("\n")
+        return lines[location.x]
     }
 
-    private fun jumpTo(destIndex: Int): String {
+    private fun getTextAndMoveTo(destIndex: Int): String {
         val stringBuilder = StringBuilder()
         while (position < destIndex) {
 
@@ -106,13 +109,7 @@ open class Scanner {
                     }
                 }
 
-                1 -> {
-                    state = when {
-                        text[p].isDigit() -> 2
-                        else -> break@loop
-                    }
-                }
-                2 -> {
+                1, 2 -> {
                     state = when {
                         text[p].isDigit() -> 2
                         else -> break@loop
@@ -121,8 +118,8 @@ open class Scanner {
             }
             p++
         }
-        newPos = p
-        return state == 2
+        newPos = p // save current p for the next iterations
+        return state == 2 // return true only if reach the end of loop with state equals 2
     }
 
     private fun isFloat(): Boolean {
@@ -290,31 +287,31 @@ open class Scanner {
     // get item and move position to the beginning of
     // the next item
     fun skipInt(): String {
-        return if (isInt()) jumpTo(newPos)
+        return if (isInt()) getTextAndMoveTo(newPos)
         else abortSyntax("Invalid Int")
     }
 
     fun skipFloat(): String {
         return if (isFloat())
-            jumpTo(newPos)
+            getTextAndMoveTo(newPos)
         else
             abortSyntax("invalid float")
     }
 
     fun skipId(): String {
-        return if (isId()) return jumpTo(newPos)
+        return if (isId()) return getTextAndMoveTo(newPos)
         else abortSyntax("Invalid Id")
     }
 
     fun skipStr(): String {
-        return if (isStr()) jumpTo(newPos)
+        return if (isStr()) getTextAndMoveTo(newPos)
         else
             abortSyntax("Invalid Int")
     }
 
     internal fun getToken(keyword: String): String {
         return if (isKeyword(keyword)) {
-            jumpTo(newPos)
+            getTextAndMoveTo(newPos)
         } else abortSyntax("$keyword is expected")
     }
 
@@ -363,8 +360,8 @@ open class Scanner {
             p++
         }
         return when (state) {
-            0 -> jumpTo(p)
-            1 -> jumpTo(p - 1)
+            0 -> getTextAndMoveTo(p)
+            1 -> getTextAndMoveTo(p - 1)
             else -> abortSyntax("Invalid Comment")
         }
     }
@@ -373,4 +370,5 @@ open class Scanner {
 //    fun skipRegEx() {
 //        decisionHelper.skipOrs()
 //    }
+
 }

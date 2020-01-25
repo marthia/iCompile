@@ -1,7 +1,9 @@
 package com.example.icompile.ui
 
+import android.Manifest
 import android.app.SearchManager
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
 import android.text.Spannable
@@ -42,6 +44,7 @@ class MainActivity : AppCompatActivity() {
         )
 
 
+
         setSupportActionBar(binding.toolbar)
 
         bindViews()
@@ -51,6 +54,8 @@ class MainActivity : AppCompatActivity() {
 
         val factory = InjectorUtils.provideCodeRepository()
 
+        obtainUserPermissions()
+
         viewModel = ViewModelProviders.of(this, factory)
             .get(EditorViewModel::class.java)
 
@@ -59,6 +64,30 @@ class MainActivity : AppCompatActivity() {
 //            isVisible.let { binding.keyboardShortcut = it }
 //        })
 
+    }
+
+    private fun obtainUserPermissions() {
+
+        val permissionArrays = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        requestPermissions(permissionArrays, 1)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        when (requestCode) {
+            1 -> {
+                if (grantResults.isEmpty()
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                ) {
+                    // if user has withdrawn the permissions , obtain again
+                    obtainUserPermissions()
+
+                }
+            }
+        }
     }
 
     private fun bindData() {
@@ -83,7 +112,7 @@ class MainActivity : AppCompatActivity() {
 
             setSearchableInfo(searchManager.getSearchableInfo(componentName))
             setIconifiedByDefault(true)
-            queryHint = "Search whole file"
+            queryHint = "Search document"
 
 
             queryTextListener = object : SearchView.OnQueryTextListener {
@@ -169,6 +198,7 @@ class MainActivity : AppCompatActivity() {
 
             R.id.btn_save -> {
                 viewModel.setCode(binding.content.text.toString())
+                parser.setText(binding.content.text.toString())
                 Toast.makeText(this, "Successfully saved!", Toast.LENGTH_LONG).show()
                 true
             }

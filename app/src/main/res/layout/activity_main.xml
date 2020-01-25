@@ -86,7 +86,7 @@
                         android:paddingEnd="16dp"
                         android:paddingBottom="16dp"
                         android:scrollbarAlwaysDrawHorizontalTrack="true"
-                        android:scrollHorizontally="true"
+                        android:scrollHorizontally="false"
                         android:selectAllOnFocus="false"
                         android:textColor="#37474f"
                         android:textSize="18sp" />
