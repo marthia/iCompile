@@ -24,16 +24,22 @@ import com.example.icompile.R
 import com.example.icompile.core.Scanner
 import com.example.icompile.data.InjectorUtils
 import com.example.icompile.databinding.ActivityMainBinding
+import com.example.icompile.syntaxhighlighting.definitions.KotlinHighlightingDefinition
 import com.example.icompile.ui.viewmodel.EditorViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import xyz.iridiumion.iridiumhighlightingeditor.highlightingdefinitions.definitions.JavaHighlightingDefinition
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var onCloseListener: SearchView.OnCloseListener
+
     private lateinit var queryTextListener: SearchView.OnQueryTextListener
+
     private lateinit var viewModel: EditorViewModel
-    private lateinit var parser: Scanner
+
+    private val scanner = Scanner()
+
     lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,8 +48,6 @@ class MainActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(
             this, R.layout.activity_main
         )
-
-
 
         setSupportActionBar(binding.toolbar)
 
@@ -85,19 +89,20 @@ class MainActivity : AppCompatActivity() {
                     // if user has withdrawn the permissions , obtain again
                     obtainUserPermissions()
 
+                } else {
+                    bindData()
                 }
             }
+
         }
     }
 
     private fun bindData() {
 
-        parser = Scanner()
-
         viewModel.codeTextUi.observe(this, Observer {
             it?.let { text ->
                 binding.code = text
-                parser.setText(text)
+                scanner.setText(text)
             }
         })
 
@@ -171,7 +176,7 @@ class MainActivity : AppCompatActivity() {
                 // getContentType()
                 if (binding.content.text != null && !TextUtils.isEmpty(binding.content.text)) {
 
-                    val skipUnread = parser.skipInt()
+                    val skipUnread = scanner.skipInt()
 
                     val view = layoutInflater.inflate(R.layout.bottom_sheet_output, null)
                     val dialog = BottomSheetDialog(this, R.style.BottomSheetStyle)
@@ -179,7 +184,7 @@ class MainActivity : AppCompatActivity() {
 
                     // set the title of result
                     val title = view.findViewById<TextView>(R.id.title)
-                    if (parser.isError) {
+                    if (scanner.isError) {
                         title.text = "ERROR LOG"
                         title.setTextColor(Color.parseColor("#A81A50"))
                     } else {
@@ -198,13 +203,13 @@ class MainActivity : AppCompatActivity() {
 
             R.id.btn_save -> {
                 viewModel.setCode(binding.content.text.toString())
-                parser.setText(binding.content.text.toString())
+                scanner.setText(binding.content.text.toString())
                 Toast.makeText(this, "Successfully saved!", Toast.LENGTH_LONG).show()
                 true
             }
 
             R.id.btn_stop -> {
-                parser.reset()
+                scanner.reset()
                 Toast.makeText(this, "Application stopped!", Toast.LENGTH_LONG).show()
 
                 true
@@ -215,119 +220,64 @@ class MainActivity : AppCompatActivity() {
 
     private fun bindViews() {
 
-        /* binding.content.addTextChangedListener(object : TextWatcher {
-
-
-             override fun beforeTextChanged(
-                 s: CharSequence,
-                 start: Int,
-                 count: Int,
-                 after: Int
-             ) {
-             }
-
-             override fun onTextChanged(
-                 s: CharSequence,
-                 start: Int,
-                 before: Int,
-                 count: Int
-             ) {
-             }
-
-
-             override fun afterTextChanged(s: Editable) {
-
-                 var offset = 0
-                 val text = binding.content.text
-
-                 while ( text != null && offset < text.length) {
-                     RESERVED.forEach {
-                         val index = text.indexOf(it, offset)
-                         if (index != -1) {
-                             text.setSpan(
-                                 ForegroundColorSpan(Color.parseColor("#3b78e7")),
-                                 index,
-                                 index + it.length,
-                                 Spannable.SPAN_INTERMEDIATE
-                             )
-                         }
-                     }
-
-
-
-                         offset++
-                 }
-                */
-
-        /* val index = s.toString().indexOf(COMMENT)
-                if (index != -1) {
-                    s.setSpan(
-                        ForegroundColorSpan(Color.parseColor("#d81b60")),
-                        index,
-                        s.indexOf("\n", index),
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                    )
-                }*//*
-
-            }
-        })*/
+        binding.content.loadHighlightingDefinition(KotlinHighlightingDefinition())
 
         binding.btnTab.setOnClickListener {
-            binding.content.text?.insert(binding.content.selectionStart, "    ")
+            binding.content.insert("\t")
         }
 
         binding.btnCurlyBraceLeft.setOnClickListener {
-            binding.content.text?.insert(binding.content.selectionStart, "{")
+            binding.content.insert("{")
         }
 
         binding.btnCurlyBraceRight.setOnClickListener {
-            binding.content.text?.insert(binding.content.selectionStart, "}")
+            binding.content.insert("}")
         }
 
         binding.btnBraceLeft.setOnClickListener {
-            binding.content.text?.insert(binding.content.selectionStart, "(")
+            binding.content.insert("(")
         }
 
         binding.btnBraceRight.setOnClickListener {
-            binding.content.text?.insert(binding.content.selectionStart, ")")
+            binding.content.insert(")")
         }
 
         binding.btnQuotation.setOnClickListener {
-            binding.content.text?.insert(binding.content.selectionStart, "\"")
+            binding.content.insert("\"")
         }
 
         binding.btnSemiColon.setOnClickListener {
-            binding.content.text?.insert(binding.content.selectionStart, ";")
+            binding.content.insert(";")
         }
 
         binding.btnArrow.setOnClickListener {
-            binding.content.text?.insert(binding.content.selectionStart, "->")
+            binding.content.insert("->")
 
         }
 
         binding.btnLessThan.setOnClickListener {
-            binding.content.text?.insert(binding.content.selectionStart, "<")
+            binding.content.insert("<")
         }
 
         binding.btnGreaterThan.setOnClickListener {
-            binding.content.text?.insert(binding.content.selectionStart, ">")
+            binding.content.insert(">")
         }
 
         binding.btnSlash.setOnClickListener {
-            binding.content.text?.insert(binding.content.selectionStart, "/")
+            binding.content.insert("/")
 
         }
 
         binding.btnBackSlash.setOnClickListener {
-            binding.content.text?.insert(binding.content.selectionStart, "\\")
+            binding.content.insert("\\")
         }
 
         binding.btnColon.setOnClickListener {
-            binding.content.text?.insert(binding.content.selectionStart, ":")
+            binding.content.insert(":")
         }
 
         binding.btnQuestionMark.setOnClickListener {
-            binding.content.text?.insert(binding.content.selectionStart, "?")
+            binding.content.insert("?")
         }
 
     }
@@ -344,10 +294,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return -1
-    }
-
-    private fun getContentType() {
-
     }
 
 }

@@ -1,14 +1,20 @@
-package com.example.icompile.ui
+package com.example.icompile.ui.views
 
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
+import android.text.Spannable
+import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatEditText
+import com.example.icompile.Constants.COMMENT
+import com.example.icompile.Constants.COMMENT_COLOR
+import com.example.icompile.Constants.KEYWORD_COLOR
+import com.example.icompile.Constants.KOTLIN_KEYWORDS
 import com.example.icompile.R
-
+@Deprecated("This class cannot provide syntax highlighting functionality")
 class EditorView : AppCompatEditText {
 
     // using `@JvmOverloads` generates unwanted bugs and styling issues
@@ -29,7 +35,7 @@ class EditorView : AppCompatEditText {
     private val mPaintHighlight = Paint().apply {
         isAntiAlias = false
         style = Paint.Style.FILL
-        color = Color.parseColor("#24A81A50")
+        color = Color.parseColor("#24b89300")
     }
     private var mHighlightedLine = -1
     private var mHighlightStart = -1
@@ -58,6 +64,7 @@ class EditorView : AppCompatEditText {
         attributes.recycle()
     }
 
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
@@ -82,6 +89,38 @@ class EditorView : AppCompatEditText {
             baseline += lineHeight
         }
 
+    }
+
+   override fun onTextChanged(
+        text: CharSequence?,
+        start: Int,
+        lengthBefore: Int,
+        lengthAfter: Int
+    ) {
+        super.onTextChanged(text, start, lengthBefore, lengthAfter)
+                text?.forEach {
+                    KOTLIN_KEYWORDS.forEach {
+                        val index = text.indexOf(it, start)
+                        if (index != -1) {
+                            getText()?.setSpan(
+                                ForegroundColorSpan(Color.parseColor(KEYWORD_COLOR)),
+                                index,
+                                index + it.length,
+                                Spannable.SPAN_INTERMEDIATE
+                            )
+                        }
+                    }
+                }
+
+        val index = getText().toString().indexOf(COMMENT)
+        if (index != -1) {
+            getText()?.setSpan(
+                ForegroundColorSpan(Color.parseColor(COMMENT_COLOR)),
+                index,
+                getText()!!.indexOf("\n", index),
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
     }
 
     /**

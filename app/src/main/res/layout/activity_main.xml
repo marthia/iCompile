@@ -25,8 +25,8 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:buttonGravity="center_vertical"
                 android:background="@color/white"
+                app:buttonGravity="center_vertical"
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
 
         </com.google.android.material.appbar.AppBarLayout>
@@ -63,7 +63,35 @@
                     android:scrollbarThumbHorizontal="@drawable/scrollbar_shape"
                     android:scrollbarThumbVertical="@drawable/scrollbar_shape">
 
-                    <com.example.icompile.ui.EditorView
+                    <!--                    <com.example.icompile.ui.views.EditorView-->
+                    <!--                        android:id="@+id/content"-->
+                    <!--                        android:layout_width="wrap_content"-->
+                    <!--                        android:layout_height="wrap_content"-->
+                    <!--                        android:allowUndo="true"-->
+                    <!--                        android:autoLink="none"-->
+                    <!--                        android:background="@drawable/background_edit_text"-->
+                    <!--                        android:elevation="1dp"-->
+                    <!--                        android:fontFamily="@font/inconsolata_regular"-->
+                    <!--                        android:hint="@string/editor_hint"-->
+                    <!--                        android:text="@{code}"-->
+                    <!--                        android:imeOptions="flagNoFullscreen|flagNoPersonalizedLearning|flagNoEnterAction"-->
+                    <!--                        android:includeFontPadding="true"-->
+                    <!--                        android:inputType="textMultiLine|textNoSuggestions"-->
+                    <!--                        android:linksClickable="true"-->
+                    <!--                        android:minWidth="450dp"-->
+                    <!--                        android:minHeight="80dp"-->
+                    <!--                        android:nestedScrollingEnabled="true"-->
+                    <!--                        android:overScrollMode="ifContentScrolls"-->
+                    <!--                        android:paddingStart="32dp"-->
+                    <!--                        android:paddingEnd="16dp"-->
+                    <!--                        android:paddingBottom="16dp"-->
+                    <!--                        android:scrollbarAlwaysDrawHorizontalTrack="true"-->
+                    <!--                        android:scrollHorizontally="false"-->
+                    <!--                        android:selectAllOnFocus="false"-->
+                    <!--                        android:textColor="#37474f"-->
+                    <!--                        android:textSize="18sp" />-->
+
+                    <com.example.icompile.ui.SyntaxHighlightingEditText
                         android:id="@+id/content"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -73,7 +101,6 @@
                         android:elevation="1dp"
                         android:fontFamily="@font/inconsolata_regular"
                         android:hint="@string/editor_hint"
-                        android:text="@{code}"
                         android:imeOptions="flagNoFullscreen|flagNoPersonalizedLearning|flagNoEnterAction"
                         android:includeFontPadding="true"
                         android:inputType="textMultiLine|textNoSuggestions"
@@ -88,6 +115,7 @@
                         android:scrollbarAlwaysDrawHorizontalTrack="true"
                         android:scrollHorizontally="false"
                         android:selectAllOnFocus="false"
+                        android:text="@{code}"
                         android:textColor="#37474f"
                         android:textSize="18sp" />
                 </HorizontalScrollView>
@@ -108,7 +136,7 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:background="#4B4B4B">
+                    android:background="#AA4B4B4B">
 
                     <ImageButton
                         android:id="@+id/btn_tab"
@@ -213,7 +241,6 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
 
 
 </layout>
