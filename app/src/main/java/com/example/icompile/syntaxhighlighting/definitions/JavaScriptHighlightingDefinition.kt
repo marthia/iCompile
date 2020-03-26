@@ -1,4 +1,4 @@
-package xyz.iridiumion.iridiumhighlightingeditor.highlightingdefinitions.definitions
+package com.example.icompile.syntaxhighlighting.definitions
 
 import com.example.icompile.syntaxhighlighting.HighLightingDefinitions
 import java.util.regex.Pattern

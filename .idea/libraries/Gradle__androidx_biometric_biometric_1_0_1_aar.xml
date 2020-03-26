@@ -1,11 +1,12 @@
 <component name="libraryTable">
   <library name="Gradle: androidx.biometric:biometric:1.0.1@aar">
     <ANNOTATIONS>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/67884196b553f90740fc361c9b642f30/biometric-1.0.1/annotations.zip!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/0f1dbc35b2fed8aca71477284f6d8ebe/biometric-1.0.1/annotations.zip!/" />
     </ANNOTATIONS>
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/67884196b553f90740fc361c9b642f30/biometric-1.0.1/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/67884196b553f90740fc361c9b642f30/biometric-1.0.1/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/0f1dbc35b2fed8aca71477284f6d8ebe/biometric-1.0.1/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/0f1dbc35b2fed8aca71477284f6d8ebe/biometric-1.0.1/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/0f1dbc35b2fed8aca71477284f6d8ebe/biometric-1.0.1/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

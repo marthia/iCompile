@@ -7,7 +7,7 @@ import java.util.regex.Pattern
  */
 
 //TODO: Include color in a newer version
-public class GenericHighlightingDefinition :
+class GenericHighlightingDefinition :
     HighLightingDefinitions {
 
 

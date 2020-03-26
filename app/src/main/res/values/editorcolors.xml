@@ -3,11 +3,11 @@
 
     <color name="syntax_error">#f95a5a</color>
 
-    <color name="syntax_number">#962bdd</color>
+    <color name="syntax_number">#2B3DDD</color>
 
     <color name="syntax_keyword">#3b78e7</color>
 
-    <color name="syntax_builtin">#494949</color>
+    <color name="syntax_builtin">#61487E</color>
 
     <color name="syntax_comment">#d81b60</color>
 

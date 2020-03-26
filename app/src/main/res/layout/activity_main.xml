@@ -6,7 +6,7 @@
     <data>
 
         <variable
-            name="code"
+            name="editor"
             type="String" />
     </data>
 
@@ -36,7 +36,7 @@
             android:layout_height="match_parent"
             android:background="@color/editor_background_color"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
-            tools:context=".ui.MainActivity">
+            tools:context=".main.MainActivity">
 
             <ScrollView
                 android:id="@+id/vertical_scroller"
@@ -91,7 +91,7 @@
                     <!--                        android:textColor="#37474f"-->
                     <!--                        android:textSize="18sp" />-->
 
-                    <com.example.icompile.ui.SyntaxHighlightingEditText
+                    <com.example.icompile.main.SyntaxHighlightingEditText
                         android:id="@+id/content"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -115,7 +115,7 @@
                         android:scrollbarAlwaysDrawHorizontalTrack="true"
                         android:scrollHorizontally="false"
                         android:selectAllOnFocus="false"
-                        android:text="@{code}"
+                        android:text="@{editor}"
                         android:textColor="#37474f"
                         android:textSize="18sp" />
                 </HorizontalScrollView>

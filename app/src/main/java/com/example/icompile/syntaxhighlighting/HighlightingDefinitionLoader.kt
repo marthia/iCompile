@@ -1,6 +1,5 @@
 package com.example.icompile.syntaxhighlighting
-import com.example.icompile.syntaxhighlighting.definitions.KotlinHighlightingDefinition
-import xyz.iridiumion.iridiumhighlightingeditor.highlightingdefinitions.definitions.*
+import com.example.icompile.syntaxhighlighting.definitions.*
 
 /**
  * Author: 0xFireball
@@ -14,13 +13,7 @@ class HighlightingDefinitionLoader {
 
             "java" -> return JavaHighlightingDefinition()
 
-            "cs" -> return CSharpHighlightingDefinition()
-
             "cpp", "cxx" -> return CPlusPlusHighlightingDefinition()
-
-            "lua" -> return LuaHighlightingDefinition()
-
-            "py" -> return PythonHighlightingDefinition() //Not yet ready!
 
             "txt" -> return NoHighlightingDefinition()
 
