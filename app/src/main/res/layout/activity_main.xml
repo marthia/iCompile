@@ -63,34 +63,6 @@
                     android:scrollbarThumbHorizontal="@drawable/scrollbar_shape"
                     android:scrollbarThumbVertical="@drawable/scrollbar_shape">
 
-                    <!--                    <com.example.icompile.ui.views.EditorView-->
-                    <!--                        android:id="@+id/content"-->
-                    <!--                        android:layout_width="wrap_content"-->
-                    <!--                        android:layout_height="wrap_content"-->
-                    <!--                        android:allowUndo="true"-->
-                    <!--                        android:autoLink="none"-->
-                    <!--                        android:background="@drawable/background_edit_text"-->
-                    <!--                        android:elevation="1dp"-->
-                    <!--                        android:fontFamily="@font/inconsolata_regular"-->
-                    <!--                        android:hint="@string/editor_hint"-->
-                    <!--                        android:text="@{code}"-->
-                    <!--                        android:imeOptions="flagNoFullscreen|flagNoPersonalizedLearning|flagNoEnterAction"-->
-                    <!--                        android:includeFontPadding="true"-->
-                    <!--                        android:inputType="textMultiLine|textNoSuggestions"-->
-                    <!--                        android:linksClickable="true"-->
-                    <!--                        android:minWidth="450dp"-->
-                    <!--                        android:minHeight="80dp"-->
-                    <!--                        android:nestedScrollingEnabled="true"-->
-                    <!--                        android:overScrollMode="ifContentScrolls"-->
-                    <!--                        android:paddingStart="32dp"-->
-                    <!--                        android:paddingEnd="16dp"-->
-                    <!--                        android:paddingBottom="16dp"-->
-                    <!--                        android:scrollbarAlwaysDrawHorizontalTrack="true"-->
-                    <!--                        android:scrollHorizontally="false"-->
-                    <!--                        android:selectAllOnFocus="false"-->
-                    <!--                        android:textColor="#37474f"-->
-                    <!--                        android:textSize="18sp" />-->
-
                     <com.example.icompile.main.SyntaxHighlightingEditText
                         android:id="@+id/content"
                         android:layout_width="wrap_content"

@@ -124,7 +124,7 @@ class Codegen(t: AST) : ASTVisitor() {
         return topFrame().size
     }
 
-    val blockSize: Int
+    private val blockSize: Int
         get() = topFrame().blockSize
 
     /** <pre>
@@ -135,12 +135,12 @@ class Codegen(t: AST) : ASTVisitor() {
      * instead, we'll generate, e.g., f<<0>> and f<<1>>
     </pre> *
      */
-    fun newLabel(label: String): String {  // create a new label from label
+    private fun newLabel(label: String): String {  // create a new label from label
         ++labelNum
         return "$label<<$labelNum>>"
     }
 
-    fun storeop(code: Code) {
+    private fun storeop(code: Code) {
 /*
         System.out.println("storeop: "+code.toString()+" fs:"+
            top.getSize()+" bs: "+top.getBlockSize());
@@ -162,16 +162,20 @@ class Codegen(t: AST) : ASTVisitor() {
         val writeLabel = "Write"
         val readTree: AST? = Constrainer.readTree
         val writeTree: AST? = Constrainer.writeTree
-        readTree!!.label = readLabel
+        if (readTree != null) {
+            readTree.label = readLabel
+        }
         storeop(LabelOpcode(Codes.ByteCodes.LABEL, readLabel))
         storeop(Code(Codes.ByteCodes.LINE))
         storeop(FunctionOpcode(Codes.ByteCodes.FUNCTION, readLabel, -1, -1))
         storeop(Code(Codes.ByteCodes.READ))
         storeop(Code(Codes.ByteCodes.RETURN))
-        writeTree!!.label = writeLabel
+        if (writeTree != null) {
+            writeTree.label = writeLabel
+        }
         storeop(LabelOpcode(Codes.ByteCodes.LABEL, writeLabel))
         val formal: String =
-            (writeTree.getKid(3)?.getKid(1)?.getKid(2) as IdTree).symbol.toString()
+            (writeTree?.getKid(3)?.getKid(1)?.getKid(2) as IdTree?)?.symbol.toString()
         storeop(Code(Codes.ByteCodes.LINE))
         storeop(FunctionOpcode(Codes.ByteCodes.FUNCTION, writeLabel, -1, -1))
         storeop(VarOpcode(Codes.ByteCodes.LOAD, 0, formal))
@@ -286,10 +290,10 @@ class Codegen(t: AST) : ASTVisitor() {
     override fun visitCallTree(t: AST?): Any? {
         val funcName = (t?.getKid(1) as IdTree?)?.decoration?.label
         val numArgs = t?.kidCount()?.minus(1)
-        if (t != null )
-        for (kid in 2..t.kidCount()) {
-            t.getKid(kid)!!.accept(this)
-        }
+        if (t != null)
+            for (kid in 2..t.kidCount()) {
+                t.getKid(kid)!!.accept(this)
+            }
         numArgs?.let { NumOpcode(Codes.ByteCodes.ARGS, it) }?.let { storeop(it) }
 
         //used to set up new frame
@@ -353,7 +357,7 @@ class Codegen(t: AST) : ASTVisitor() {
         val continueLabel = newLabel("continue")
         t?.getKid(1)?.accept(this) // gen code for conditional expr
         storeop(LabelOpcode(Codes.ByteCodes.FALSEBRANCH, elseLabel))
-        if (t?.line !== lineNo) {
+        if (t?.line != lineNo) {
             lineNo = t!!.line
             storeop(NumOpcode(Codes.ByteCodes.LINE, lineNo))
         }
@@ -361,12 +365,12 @@ class Codegen(t: AST) : ASTVisitor() {
         storeop(LabelOpcode(Codes.ByteCodes.GOTO, continueLabel))
         storeop(LabelOpcode(Codes.ByteCodes.LABEL, elseLabel))
         t.getKid(3)?.accept(this)
-        if (t.line !== lineNo) {
+        if (t.line != lineNo) {
             lineNo = t.line
             storeop(NumOpcode(Codes.ByteCodes.LINE, lineNo))
         }
         storeop(LabelOpcode(Codes.ByteCodes.LABEL, continueLabel))
-        if (t.line !== lineNo) {
+        if (t.line != lineNo) {
             lineNo = t.line
             storeop(NumOpcode(Codes.ByteCodes.LINE, lineNo))
         }
@@ -389,23 +393,34 @@ class Codegen(t: AST) : ASTVisitor() {
         val continueLabel = newLabel("continue")
         val whileLabel = newLabel("while")
         storeop(LabelOpcode(Codes.ByteCodes.LABEL, whileLabel))
-        if (t!!.line !== lineNo) {
-            lineNo = t!!.line
+        if (t!!.line != lineNo) {
+            lineNo = t.line
             storeop(NumOpcode(Codes.ByteCodes.LINE, lineNo))
         }
-        t!!.getKid(1)?.accept(this)
+        t.getKid(1)?.accept(this)
         storeop(LabelOpcode(Codes.ByteCodes.FALSEBRANCH, continueLabel))
         t.getKid(2)?.accept(this)
-        if (t.line !== lineNo) {
+        if (t.line != lineNo) {
             lineNo = t.line
             storeop(NumOpcode(Codes.ByteCodes.LINE, lineNo))
         }
         storeop(LabelOpcode(Codes.ByteCodes.GOTO, whileLabel))
         storeop(LabelOpcode(Codes.ByteCodes.LABEL, continueLabel))
-        if (t.line !== lineNo) {
+        if (t.line != lineNo) {
             lineNo = t.line
             storeop(NumOpcode(Codes.ByteCodes.LINE, lineNo))
         }
+        return null
+    }
+
+    override fun visitStringTypeTree(t: AST?): Any? {
+        return null
+    }
+
+    override fun visitStringTree(t: AST?): Any? {
+        val num: String =
+            (t as StringTree).symbol.toString()
+        storeop(StringOpCode(Codes.ByteCodes.LIT, num))
         return null
     }
 

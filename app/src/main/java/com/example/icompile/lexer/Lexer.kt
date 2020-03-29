@@ -1,6 +1,7 @@
 package com.example.icompile.lexer
 
 import android.util.Log
+import com.example.icompile.parser.SyntaxError
 
 /**
  * The Lexer class is responsible for scanning the source file
@@ -62,7 +63,7 @@ class Lexer(sourceFile: String) {
         endPosition: Int,
         lineNumber: Int
     ): Token? {
-        return Symbol.symbol(number, Tokens.INTeger)?.let {
+        return Symbol.symbol(number, Tokens.Integer)?.let {
             Token(
                 startPosition, endPosition, lineNumber,
                 it
@@ -85,6 +86,19 @@ class Lexer(sourceFile: String) {
         }
     }
 
+    private fun newStringToken(
+        str: String,
+        startPosition: Int,
+        endPosition: Int,
+        lineNumber: Int
+    ): Token? {
+        return Symbol.symbol(str, Tokens.String)?.let {
+            Token(
+                startPosition, endPosition, lineNumber,
+                it
+            )
+        }
+    }
 
 
     /**
@@ -95,8 +109,13 @@ class Lexer(sourceFile: String) {
      * @param endPosition is the column in the source file where the token ends
      * @return the Token just found
      */
-    private fun makeToken(s: String, startPosition: Int, endPosition: Int, lineNumber: Int): Token? {
-        if (s == "--") {  // filter comment
+    private fun makeToken(
+        s: String,
+        startPosition: Int,
+        endPosition: Int,
+        lineNumber: Int
+    ): Token? {
+        if (s == "//") {  // filter comment
             try {
                 val oldLine: Int = source!!.lineno
                 do {
@@ -139,9 +158,11 @@ class Lexer(sourceFile: String) {
             atEOF = true
             return nextToken()
         }
+
         startPosition = source!!.position
         endPosition = startPosition - 1
         lineNumber = source!!.lineno
+
         if (Character.isJavaIdentifierStart(ch)) {
             // return tokens for ids and reserved words, checking for appropriate REGEX pattern:
             var id = ""
@@ -160,6 +181,7 @@ class Lexer(sourceFile: String) {
                 nextToken()
             } else newIdToken(id, startPosition, endPosition, lineNumber)
         }
+
         if (Character.isDigit(ch)) {
             // return int and float tokens:
             var number = ""
@@ -185,9 +207,30 @@ class Lexer(sourceFile: String) {
             }
         }
 
+        if (ch == '"') {
+
+            try {
+                var id = ""
+                ch = source!!.read() // skip the quotes
+                startPosition++
+                do {
+                    id += ch
+                    endPosition++
+                    ch = source!!.read()
+                } while (ch != '"')
+                ch = source!!.read()
+                endPosition++
+
+                return newStringToken(id, startPosition, endPosition, lineNumber)
+            } catch (e: SyntaxError) {
+                throw e
+            }
+        }
+
         // At this point the only tokens to check for are one or two
         // characters; we must also check for comments that begin with
-        // 2 --'s
+        // 2 //'s
+
         val charOld = "" + ch
         var op = charOld
         val sym: Symbol?

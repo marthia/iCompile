@@ -29,12 +29,10 @@ object CodeBll {
 
     }
 
-
     fun getCode(): String {
 
         return loadTextFromFile(FULL_PATH).orEmpty()
     }
-
 
     fun saveCode(text: String): String {
 

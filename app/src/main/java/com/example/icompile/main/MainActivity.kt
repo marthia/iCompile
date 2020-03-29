@@ -50,16 +50,11 @@ class MainActivity : AppCompatActivity() {
         bindViews()
 
         // populate the editor from file
-        populateEditor()
+        binding.editor = CodeBll.getCode()
 
         // set title with a custom font
         binding.toolbar.setTitleTextAppearance(this, R.style.titleStyle)
 
-    }
-
-    private fun populateEditor() {
-
-        binding.editor = CodeBll.getCode()
     }
 
     // obtain the required permissions for I/O actions
@@ -79,7 +74,7 @@ class MainActivity : AppCompatActivity() {
                 if (grantResults.isEmpty()
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED
                 ) {
-                    // if user has withdrawn the permissions , obtain again
+                    // if user has withdrawn the permissions , ask again
                     obtainUserPermissions()
 
                 } else {
@@ -200,13 +195,9 @@ class MainActivity : AppCompatActivity() {
 
         Toast.makeText(
                 this,
-
                 CodeBll.saveCode(code),
-
                 Toast.LENGTH_LONG
-            )
-
-            .show()
+            ).show()
     }
 
     private fun bindViews() {

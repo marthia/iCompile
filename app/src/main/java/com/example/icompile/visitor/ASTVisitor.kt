@@ -38,4 +38,6 @@ abstract class ASTVisitor {
     abstract fun visitRelOpTree(t: AST?): Any?
     abstract fun visitReturnTree(t: AST?): Any?
     abstract fun visitWhileTree(t: AST?): Any?
+    abstract fun visitStringTypeTree(t: AST?): Any?
+    abstract fun visitStringTree(t: AST?): Any?
 }

@@ -22,9 +22,13 @@ class TokenType {
             "int",
             Tokens.Int
         )
-        tokens[Tokens.BOOLean] = Symbol.symbol(
+        tokens[Tokens.Boolean] = Symbol.symbol(
             "boolean",
-            Tokens.BOOLean
+            Tokens.Boolean
+        )
+        tokens[Tokens.String] = Symbol.symbol(
+            "string",
+            Tokens.String
         )
         tokens[Tokens.If] = Symbol.symbol(
             "if",
@@ -58,13 +62,17 @@ class TokenType {
             "<id>",
             Tokens.Identifier
         )
-        tokens[Tokens.INTeger] = Symbol.symbol(
+        tokens[Tokens.Integer] = Symbol.symbol(
             "<int>",
-            Tokens.INTeger
+            Tokens.Integer
         )
         tokens[Tokens.Float] = Symbol.symbol(
             "<float>",
             Tokens.Float
+        )
+        tokens[Tokens.String] = Symbol.symbol(
+            "<string>",
+            Tokens.String
         )
         tokens[Tokens.LeftBrace] = Symbol.symbol(
             "{",
@@ -139,12 +147,16 @@ class TokenType {
             Tokens.Divide
         )
         tokens[Tokens.Comment] = Symbol.symbol(
-            "--",
+            "//",
             Tokens.Comment
         )
         tokens[Tokens.Not] = Symbol.symbol(
             "!",
             Tokens.Not
+        )
+        tokens[Tokens.DoubleQuote] = Symbol.symbol(
+            "\"",
+            Tokens.DoubleQuote
         )
     }
 }

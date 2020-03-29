@@ -11,7 +11,7 @@ import android.text.style.BackgroundColorSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.ReplacementSpan
 import android.util.AttributeSet
-import android.widget.EditText
+import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.ContextCompat
 import com.example.icompile.R
 import com.example.icompile.syntaxhighlighting.GenericHighlightingDefinition
@@ -19,7 +19,7 @@ import com.example.icompile.syntaxhighlighting.HighLightingDefinitions
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
 
-class SyntaxHighlightingEditText : EditText {
+class SyntaxHighlightingEditText : AppCompatEditText {
 
     interface OnTextChangedListener {
         fun onTextChanged(text: String)
@@ -66,7 +66,7 @@ class SyntaxHighlightingEditText : EditText {
                 e.toString()
             )
 
-        highlightWithoutChange(e)
+        highlightWithoutChange(e!!)
     }
 
     private var onTextChangedListener: OnTextChangedListener? = null
@@ -174,11 +174,11 @@ class SyntaxHighlightingEditText : EditText {
         onTextChangedListener = listener
     }
 
-    fun setUpdateDelay(ms: Int) {
+    private fun setUpdateDelay(ms: Int) {
         updateDelay = ms
     }
 
-    fun setTabWidth(characters: Int) {
+    private fun setTabWidth(characters: Int) {
         if (tabWidthInCharacters == characters)
             return
 
@@ -195,7 +195,7 @@ class SyntaxHighlightingEditText : EditText {
     }
 
     fun updateHighlighting() {
-        highlightWithoutChange(text)
+        highlightWithoutChange(text!!)
     }
 
     fun loadHighlightingDefinition(newHighlightingDefinition: HighLightingDefinitions) {
@@ -227,7 +227,7 @@ class SyntaxHighlightingEditText : EditText {
         val start = selectionStart
         val end = selectionEnd
 
-        text.replace(
+        text?.replace(
             start.coerceAtMost(end),
             start.coerceAtLeast(end),
             s,
@@ -248,7 +248,7 @@ class SyntaxHighlightingEditText : EditText {
         else {
             // add an empty line between the last #endif
             // and the now following uniform
-            start = endIndexOfLastEndIf(e)
+            start = endIndexOfLastEndIf(e!!)
             if (start > -1)
                 statement = "\n" + statement
 
@@ -257,7 +257,7 @@ class SyntaxHighlightingEditText : EditText {
             ++start
         }
 
-        e.insert(start, "$statement;\n")
+        e?.insert(start, "$statement;\n")
     }
 
     private fun endIndexOfLastEndIf(e: Editable): Int {

@@ -1,12 +1,12 @@
 package com.example.icompile.compiler
 
+import com.example.icompile.ast.AST
 import com.example.icompile.codegen.Codegen
 import com.example.icompile.constrain.Constrainer
 import com.example.icompile.parser.Parser
-import com.example.icompile.parser.ParsingResult
+import com.example.icompile.parser.SyntaxError
 import java.io.File
 import java.util.*
-import kotlin.properties.Delegates
 
 /**
  * The Compiler class contains the main program for compiling
@@ -26,19 +26,16 @@ class Compiler(
 
 
         val parser = Parser(sourceFile)
-        var parsingResult: ParsingResult? = null
         return  try {
-            parsingResult = parser.execute()
-            val con = Constrainer(parsingResult.tree!!, parser)
+            val tree : AST? = parser.execute()
+            val con = Constrainer(tree!!, parser)
             con.execute()
-            val generator = Codegen(parsingResult.tree!!)
+            val generator = Codegen(tree)
             val program = generator.execute()
             program.printCodes(FULL_PATH_BYTECODE)
 
-        } catch (e: java.lang.Exception) {
-            val split = parsingResult?.syntaxErrorLineNumber?.split(":")
-             "Error occurred at line ' ${split?.get(0)} ' \n cannot resolve " +
-                    "token ' ${split?.get(1)} '"
+        } catch (e: SyntaxError) {
+            e.print()
         }
     }
 

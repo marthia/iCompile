@@ -72,7 +72,11 @@ class Constrainer(t: AST, parser: Parser) : ASTVisitor() {
      * @return the intrinsic tree corresponding to the type of t
      */
     private fun getType(t: AST): AST? {
-        return if (t.javaClass === IntTypeTree::class.java) intTree else boolTree
+        return when {
+            t.javaClass === IntTypeTree::class.java -> intTree
+            t.javaClass === StringTypeTree::class.java -> stringTree
+            else -> boolTree
+        }
     }
 
     fun decorate(t: AST, decoration: AST?) {
@@ -91,23 +95,35 @@ class Constrainer(t: AST, parser: Parser) : ASTVisitor() {
      * as any other AST
      */
     private fun buildIntrinsicTrees() {
+
         val lex: Lexer = parser.lex
+
         trueTree = lex.newIdToken("true", -1, -1, -1)?.let { IdTree(it) }
+
         falseTree = lex.newIdToken("false", -1, -1, -1)?.let { IdTree(it) }
+
         readId = lex.newIdToken("read", -1, -1, -1)?.let { IdTree(it) }
+
         writeId = lex.newIdToken("write", -1, -1, -1)?.let { IdTree(it) }
+
         boolTree = lex.newIdToken("<<bool>>", -1, -1, -1)?.let { IdTree(it) }?.let {
             DeclTree().addKid(BoolTypeTree())
                 .addKid(it)
         }
         boolTree?.getKid(2)?.let { decorate(it, boolTree) }
-        intTree =
-            lex.newIdToken("<<int>>", -1, -1, -1)?.let {
-                IdTree(
-                    it
-                )
-            }?.let { DeclTree().addKid(IntTypeTree()).addKid(it) }
+
+        intTree = lex.newIdToken("<<int>>", -1, -1, -1)?.let { IdTree(it) }?.let {
+            DeclTree().addKid(IntTypeTree())
+                .addKid(it)
+        }
+
+        stringTree = lex.newIdToken("<<string>>", -1, -1, -1)?.let { IdTree(it) }?.let {
+            DeclTree().addKid(StringTypeTree())
+                .addKid(it)
+        }
+
         intTree?.getKid(2)?.let { decorate(it, intTree) }
+
         // to facilitate type checking; this ensures int decls and id decls
         // have the same structure
 
@@ -263,6 +279,15 @@ class Constrainer(t: AST, parser: Parser) : ASTVisitor() {
         return null
     }
 
+    override fun visitStringTypeTree(t: AST?): Any? {
+       return null
+    }
+
+    override fun visitStringTree(t: AST?): Any? {
+        decorate(t!!, stringTree)
+        return stringTree
+    }
+
     /**
      * Constrain the Return tree:<br></br>
      * Check that the returned expression type matches the type indicated
@@ -387,6 +412,7 @@ class Constrainer(t: AST, parser: Parser) : ASTVisitor() {
         var trueTree: AST? = null
         var readId: AST? = null
         var writeId: AST? = null
+        var stringTree: AST? = null
     }
 
     init {

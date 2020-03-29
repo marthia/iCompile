@@ -122,6 +122,16 @@ class PrintVisitor : ASTVisitor() {
         return null
     }
 
+    override fun visitStringTypeTree(t: AST?): Any? {
+        print("StringType", t!!)
+        return null
+    }
+
+    override fun visitStringTree(t: AST?): Any? {
+        print("String: " + (t as StringTree).symbol.toString(), t)
+        return null
+    }
+
     override fun visitReturnTree(t: AST?): Any? {
         print("Return", t!!)
         return null

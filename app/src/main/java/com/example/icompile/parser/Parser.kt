@@ -119,20 +119,10 @@ class Parser(sourceProgram: String) {
      * @exception Exception - pass on any type of exception raised
      */
     @Throws(Exception::class)
-    fun execute(): ParsingResult {
-        val rProgram: AST?
+    fun execute(): AST? {
 
-        return try {
-            rProgram = rProgram()
-            ParsingResult(
-                tree = rProgram,
-                syntaxErrorLineNumber = null)
-        } catch (e: SyntaxError) {
-            e.print()
-            ParsingResult(
-                tree = null,
-                syntaxErrorLineNumber = "${lex.lineNumber}:${currentToken}")
-        }
+        return rProgram()
+
     }
 
     /**
@@ -179,7 +169,7 @@ class Parser(sourceProgram: String) {
     }
 
     private fun startingDecl(): Boolean {
-        return isNextTok(Tokens.Int) || isNextTok(Tokens.BOOLean)
+        return isNextTok(Tokens.Int) || isNextTok(Tokens.Boolean) || isNextTok(Tokens.String)
     }
 
     private fun startingStatement(): Boolean {
@@ -199,9 +189,8 @@ class Parser(sourceProgram: String) {
     @Throws(SyntaxError::class)
     fun rDecl(): AST {
         var t: AST
-        val t1: AST
         t = rType()
-        t1 = rName()
+        val t1: AST = rName()
         if (isNextTok(Tokens.LeftParen)) { // function
             t = FunctionDeclTree().addKid(t).addKid(t1)
             t.addKid(rFunHead())
@@ -224,12 +213,21 @@ class Parser(sourceProgram: String) {
     @Throws(SyntaxError::class)
     fun rType(): AST {
         val t: AST
-        if (isNextTok(Tokens.Int)) {
-            t = IntTypeTree()
-            scan()
-        } else {
-            expect(Tokens.BOOLean)
-            t = BoolTypeTree()
+
+        when {
+            isNextTok(Tokens.Int) -> {
+                t = IntTypeTree()
+                scan()
+
+            }
+            isNextTok(Tokens.String) -> {
+                t = StringTypeTree()
+                scan()
+            }
+            else -> {
+                expect(Tokens.Boolean)
+                t = BoolTypeTree()
+            }
         }
         return t
     }
@@ -341,7 +339,7 @@ class Parser(sourceProgram: String) {
         var tree: AST
         var kid = rTerm()
         while (true) {
-            tree = addOperTree?: break
+            tree = addOperTree ?: break
             tree.addKid(kid)
             tree.addKid(rTerm())
             kid = tree
@@ -366,7 +364,7 @@ class Parser(sourceProgram: String) {
         var kid = rFactor()
 
         while (true) {
-            tree = multOperTree?: break
+            tree = multOperTree ?: break
             tree.addKid(kid)
             tree.addKid(rFactor())
             kid = tree
@@ -393,8 +391,13 @@ class Parser(sourceProgram: String) {
             expect(Tokens.RightParen)
             return t
         }
-        if (isNextTok(Tokens.INTeger)) {  //  -> <int>
+        if (isNextTok(Tokens.Integer)) {  //  -> <int>
             t = IntTree(currentToken!!)
+            scan()
+            return t
+        }
+        if (isNextTok(Tokens.String)) {
+            t = StringTree(currentToken!!)
             scan()
             return t
         }
@@ -435,7 +438,7 @@ class Parser(sourceProgram: String) {
             scan()
             return t
         }
-        throw SyntaxError(currentToken, Tokens.Identifier)
+        throw SyntaxError(currentToken, Tokens.Identifier, lex.lineNumber.toString())
     }
 
     private fun isNextTok(kind: Tokens): Boolean {
@@ -451,7 +454,7 @@ class Parser(sourceProgram: String) {
             scan()
             return
         }
-        throw SyntaxError(currentToken, kind)
+        throw SyntaxError(currentToken, kind, lex.lineNumber.toString())
     }
 
     private fun scan() {
@@ -485,20 +488,20 @@ internal class SyntaxError//    this.tokenFound = tokenFound;
  * @param kindExpected is the token we expected to find based on the current
  * context
  */(
-    tokenFound: Token?,
+    private val tokenFound: Token?,
     /**
      *
      */
     //private Token tokenFound;
-    private val kindExpected: Tokens
+    private val kindExpected: Tokens,
+    private val lineNumber: String
 ) :
     Exception() {
-    fun print() {
-        println(
-            "Expected: "
-                    + kindExpected
-        )
-        return
+    fun print(): String {
+        return "Error occurred at line $lineNumber \n " +
+                "cannot resolve token '$tokenFound' \n " +
+                "Expected: $kindExpected"
+
     }
 
     companion object {
