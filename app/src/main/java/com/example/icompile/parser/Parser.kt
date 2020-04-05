@@ -18,10 +18,12 @@ import java.util.*
  * BLOCK -> �{� D* S* �}�  ==> block
  *
  * D -> TYPE NAME                    ==> decl
+ * -> TYPE NAME "=" E
  * -> TYPE NAME FUNHEAD BLOCK      ==> functionDecl
  *
  * TYPE  ->  �int�
  * ->  �boolean�
+ * -> �string�
  *
  * FUNHEAD  -> '(' (D list ',')? ')'  ==> formals<br></br>
  *
@@ -156,14 +158,19 @@ class Parser(sourceProgram: String) {
      */
     @Throws(SyntaxError::class)
     fun rBlock(): AST {
+
         expect(Tokens.LeftBrace)
+
         val t: AST = BlockTree()
+
         while (startingDecl()) {  // get decls
             t.addKid(rDecl())
         }
+
         while (startingStatement()) {  // get statements
             t.addKid(rStatement())
         }
+
         expect(Tokens.RightBrace)
         return t
     }
@@ -188,8 +195,7 @@ class Parser(sourceProgram: String) {
      */
     @Throws(SyntaxError::class)
     fun rDecl(): AST {
-        var t: AST
-        t = rType()
+        var t = rType()
         val t1: AST = rName()
         if (isNextTok(Tokens.LeftParen)) { // function
             t = FunctionDeclTree().addKid(t).addKid(t1)
@@ -197,8 +203,14 @@ class Parser(sourceProgram: String) {
             t.addKid(rBlock())
             return t
         }
-        t = DeclTree().addKid(t).addKid(t1)
-        return t
+//        else if (isNextTok(Tokens.Assign)) {
+//            val t = DeclTree().addKid(t).addKid(t1)
+//
+//            expect(Tokens.Assign)
+//           return t.addKid(rExpr())
+//
+//        }
+        return DeclTree().addKid(t).addKid(t1)
     }
 
     /**
@@ -224,10 +236,16 @@ class Parser(sourceProgram: String) {
                 t = StringTypeTree()
                 scan()
             }
+//            isNextTok(Tokens.Boolean) -> {
             else -> {
                 expect(Tokens.Boolean)
+
                 t = BoolTypeTree()
+                scan()
             }
+//            else -> {
+//                return null
+//            }
         }
         return t
     }
@@ -266,13 +284,13 @@ class Parser(sourceProgram: String) {
      * S -> 'if' e 'then' block 'else' block ==> if -> 'while' e block ==> while
      * -> 'return' e ==> return -> block -> name '=' e ==> assign
      *
-     *
      * @return the tree corresponding to the statement found
      * @exception SyntaxError - thrown for any syntax error
      */
     @Throws(SyntaxError::class)
     fun rStatement(): AST {
         var t: AST
+
         if (isNextTok(Tokens.If)) {
             scan()
             t = IfTree()
@@ -283,6 +301,7 @@ class Parser(sourceProgram: String) {
             t.addKid(rBlock())
             return t
         }
+
         if (isNextTok(Tokens.While)) {
             scan()
             t = WhileTree()
@@ -290,19 +309,26 @@ class Parser(sourceProgram: String) {
             t.addKid(rBlock())
             return t
         }
+
         if (isNextTok(Tokens.Return)) {
             scan()
             t = ReturnTree()
             t.addKid(rExpr())
             return t
         }
+
         if (isNextTok(Tokens.LeftBrace)) {
             return rBlock()
         }
+
         t = rName()
+
         t = AssignTree().addKid(t)
+
         expect(Tokens.Assign)
+
         t.addKid(rExpr())
+
         return t
     }
 
@@ -478,7 +504,6 @@ class Parser(sourceProgram: String) {
         }
     }
 }
-
 
 internal class SyntaxError//    this.tokenFound = tokenFound;
 /**

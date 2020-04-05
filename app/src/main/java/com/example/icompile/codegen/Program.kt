@@ -34,7 +34,7 @@ class Program {
             println(e.toString())
         }
 
-        // generating the code both for showcasing in app and also preserving in file
+        // constructing the code both for showcasing in app and also preserving in file
         val stringBuilder = StringBuilder()
         for (nextCode in program) {
             println(nextCode.toString())

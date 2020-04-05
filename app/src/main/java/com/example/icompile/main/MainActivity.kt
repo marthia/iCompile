@@ -17,6 +17,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.example.icompile.R
 import com.example.icompile.databinding.ActivityMainBinding
@@ -43,14 +45,14 @@ class MainActivity : AppCompatActivity() {
             this, R.layout.activity_main
         )
 
+
         // set for customizing the toolbar
         setSupportActionBar(binding.toolbar)
 
         // init all views
         bindViews()
 
-        // populate the editor from file
-        binding.editor = CodeBll.getCode()
+        obtainUserPermissions()
 
         // set title with a custom font
         binding.toolbar.setTitleTextAppearance(this, R.style.titleStyle)
@@ -60,8 +62,27 @@ class MainActivity : AppCompatActivity() {
     // obtain the required permissions for I/O actions
     private fun obtainUserPermissions() {
 
-        val permissionArrays = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        requestPermissions(permissionArrays, 1)
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                1
+            )
+        } else {
+            // Permission has already been granted
+
+            // populate the editor from file
+            binding.editor = CodeBll.getCode()
+
+        }
+
     }
 
     override fun onRequestPermissionsResult(
@@ -74,15 +95,22 @@ class MainActivity : AppCompatActivity() {
                 if (grantResults.isEmpty()
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED
                 ) {
-                    // if user has withdrawn the permissions , ask again
-                    obtainUserPermissions()
+                    // populate the editor from file
+                    binding.editor = CodeBll.getCode()
 
                 } else {
-                    CodeBll.getCode()
+                    // if user has withdrawn the permissions , ask again
+                    createNecessaryFiles()
+
+                    obtainUserPermissions()
                 }
             }
 
         }
+    }
+
+    fun createNecessaryFiles() {
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -194,10 +222,10 @@ class MainActivity : AppCompatActivity() {
         val code = binding.content.text.toString()
 
         Toast.makeText(
-                this,
-                CodeBll.saveCode(code),
-                Toast.LENGTH_LONG
-            ).show()
+            this,
+            CodeBll.saveCode(code),
+            Toast.LENGTH_LONG
+        ).show()
     }
 
     private fun bindViews() {

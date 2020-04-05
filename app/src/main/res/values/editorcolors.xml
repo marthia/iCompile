@@ -7,7 +7,7 @@
 
     <color name="syntax_keyword">#3b78e7</color>
 
-    <color name="syntax_builtin">#61487E</color>
+    <color name="syntax_builtin">#7600FF</color>
 
     <color name="syntax_comment">#d81b60</color>
 

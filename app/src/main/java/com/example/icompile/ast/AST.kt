@@ -58,6 +58,7 @@ abstract class AST {
      * @return the desired Object, as determined by the visitor
      */
     abstract fun accept(v: ASTVisitor?): Any?
+
     fun addKid(kid: AST): AST {
         kids.add(kid)
         return this

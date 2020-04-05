@@ -27,7 +27,7 @@ class TokenType {
             Tokens.Boolean
         )
         tokens[Tokens.String] = Symbol.symbol(
-            "string",
+            "String",
             Tokens.String
         )
         tokens[Tokens.If] = Symbol.symbol(

@@ -48,10 +48,6 @@ class SourceReader(sourceFile: String) {
             position = -1
             nextLine = source.readLine()
             possibleFloat = false
-            /* if (nextLine != null) {
-                System.out.println("\nREADLINE:   "+nextLine + "\n");
-                System.out.println("\nREADLINE:   "+sourceLines.get(lineno-1) + "\n");
-            }*/
 
             isPriorEndLine = false
         }
@@ -90,10 +86,6 @@ class SourceReader(sourceFile: String) {
      */
     init {
         try {
-            val sep = System.getProperty("file.separator")
-//            source =
-//                BufferedReader(FileReader("src" + sep + "interpreter" + sep + sourceFile))
-//
             source =
                 BufferedReader(FileReader(sourceFile))
         } catch (e: Exception) {

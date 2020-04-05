@@ -31,20 +31,27 @@ object CodeBll {
 
     fun getCode(): String {
 
+        // create our own folder for any file : could be asked from user in future
+        if (!File("${Environment.getExternalStorageDirectory()}${CODE_TEXT_FOLDER_PATH}").exists()) {
+
+            File("${Environment.getExternalStorageDirectory()}${CODE_TEXT_FOLDER_PATH}").mkdir()
+
+            // need to create empty files for the app to work
+            File(FULL_PATH).createNewFile()
+            File(BYTECODE_FILE).createNewFile()
+
+
+        } else {
+
+            if (!File(FULL_PATH).exists()) File(FULL_PATH).createNewFile()
+
+            if (!File(FULL_PATH_BYTECODE).exists()) File(FULL_PATH_BYTECODE).createNewFile()
+        }
+
         return loadTextFromFile(FULL_PATH).orEmpty()
     }
 
     fun saveCode(text: String): String {
-
-        // create our own folder for any file : could be asked from user in future
-        if (!File("${Environment.getExternalStorageDirectory()}${CODE_TEXT_FOLDER_PATH}").exists()) {
-
-
-            if (File("${Environment.getExternalStorageDirectory()}${CODE_TEXT_FOLDER_PATH}")
-                    .mkdir()
-            )
-                File(FULL_PATH).createNewFile()
-        }
 
         return if (saveTextFile(text, FULL_PATH)) "Code Successfully saved"
         else "Error Saving the code, try again later"

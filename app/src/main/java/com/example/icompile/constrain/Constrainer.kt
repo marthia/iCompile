@@ -59,10 +59,7 @@ class Constrainer(t: AST, parser: Parser) : ASTVisitor() {
      * Decorate the IdTree with the given decoration - its decl tree
      */
     private fun enter(t: AST, decoration: AST) {
-/*
-        System.out.println("enter: "+((IdTree)t).getSymbol().toString()
-              + ": " + decoration.getNodeNum());
-*/
+
         (t as IdTree).symbol?.let { symtab.put(it, decoration) }
     }
 
@@ -251,10 +248,12 @@ class Constrainer(t: AST, parser: Parser) : ASTVisitor() {
      * retrieve the information in this tree
      */
     override fun visitDeclTree(t: AST?): Any? {
+
         val idTree: AST? = t?.getKid(2)
         idTree?.let { enter(it, t) }
         val typeTree: AST? = t?.getKid(1)?.let { getType(it) }
         idTree?.let { decorate(it, typeTree) }
+
         return null
     }
 
