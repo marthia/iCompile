@@ -19,13 +19,12 @@ class Token
     val symbol: Symbol
 ) {
 
-    fun print() {
-        println(
+    fun print() : String {
+        return (
             "       " + symbol.toString() +
                     "             left: " + leftPosition +
                     " right: " + rightPosition + " line: " + lineno
-        )
-        return
+                )
     }
 
     override fun toString(): String {

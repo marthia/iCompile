@@ -232,20 +232,18 @@ class Parser(sourceProgram: String) {
                 scan()
 
             }
-            isNextTok(Tokens.String) -> {
+            isNextTok(Tokens.DoubleQuote) -> {
+
                 t = StringTypeTree()
                 scan()
+                expect(Tokens.DoubleQuote)
             }
-//            isNextTok(Tokens.Boolean) -> {
             else -> {
                 expect(Tokens.Boolean)
 
                 t = BoolTypeTree()
                 scan()
             }
-//            else -> {
-//                return null
-//            }
         }
         return t
     }
@@ -422,9 +420,14 @@ class Parser(sourceProgram: String) {
             scan()
             return t
         }
-        if (isNextTok(Tokens.String)) {
-            t = StringTree(currentToken!!)
+        if (isNextTok(Tokens.DoubleQuote)) {
             scan()
+            if (currentToken == null) {
+                throw SyntaxError(null, lex.lineNumber.toString())
+            } else
+                t = StringTree(currentToken!!)
+            expect(Tokens.String)
+            expect(Tokens.DoubleQuote)
             return t
         }
         t = rName()
@@ -464,7 +467,7 @@ class Parser(sourceProgram: String) {
             scan()
             return t
         }
-        throw SyntaxError(currentToken, Tokens.Identifier, lex.lineNumber.toString())
+        throw SyntaxError(currentToken, lex.lineNumber.toString())
     }
 
     private fun isNextTok(kind: Tokens): Boolean {
@@ -480,7 +483,7 @@ class Parser(sourceProgram: String) {
             scan()
             return
         }
-        throw SyntaxError(currentToken, kind, lex.lineNumber.toString())
+        throw SyntaxError(currentToken, lex.lineNumber.toString())
     }
 
     private fun scan() {
@@ -514,18 +517,13 @@ internal class SyntaxError//    this.tokenFound = tokenFound;
  * context
  */(
     private val tokenFound: Token?,
-    /**
-     *
-     */
-    //private Token tokenFound;
-    private val kindExpected: Tokens,
     private val lineNumber: String
 ) :
     Exception() {
     fun print(): String {
         return "Error occurred at line $lineNumber \n " +
                 "cannot resolve token '$tokenFound' \n " +
-                "Expected: $kindExpected"
+                "Expected: ${tokenFound?.kind}"
 
     }
 
