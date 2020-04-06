@@ -158,15 +158,7 @@ class MainActivity : AppCompatActivity() {
                     return true
                 }
             }
-
-            onCloseListener = SearchView.OnCloseListener {
-                binding.content.text?.clearSpans()
-                false
-            }
-
             setOnQueryTextListener(queryTextListener)
-
-            setOnCloseListener(onCloseListener)
         }
 
         return super.onCreateOptionsMenu(menu)

@@ -2,6 +2,7 @@ package com.example.icompile.lexer
 
 import android.util.Log
 import com.example.icompile.parser.SyntaxError
+import java.io.FileReader
 
 /**
  * The Lexer class is responsible for scanning the source file
@@ -13,15 +14,18 @@ import com.example.icompile.parser.SyntaxError
  * are space, tab, newlines
  */
 class Lexer(sourceFile: String) {
+    private var startQuote = false
+    private var endQuote = false
+    private var position = 0
     private var atEOF = false
     private var ch // next character to process
             : Char
-    private var source: SourceReader?
+    var source: String = FileReader(sourceFile).readText()
+    var lineNumber = 1
 
     // positions in line of current token
     private var startPosition = 0
     private var endPosition = 0
-    var lineNumber = 0
 
     /**
      * newIdTokens are either ids or reserved words; new id's will be inserted
@@ -117,10 +121,11 @@ class Lexer(sourceFile: String) {
     ): Token? {
         if (s == "//") {  // filter comment
             try {
-                val oldLine: Int = source!!.lineno
                 do {
-                    ch = source!!.read()
-                } while (oldLine == source!!.lineno)
+                    ch = source[position]
+                    position++
+
+                } while (!ch.toString().matches("\n".toRegex()) && position <= source.length)
             } catch (e: Exception) {
                 atEOF = true
             }
@@ -140,37 +145,36 @@ class Lexer(sourceFile: String) {
      * @return the next Token found in the source file
      */
     fun nextToken(): Token? { // ch is always the next char to process
-        if (atEOF) {
-            if (source != null) {
-                source!!.close()
-                source = null
-            }
+
+        if (position >= source.length) {
+            source = ""
             return null
         }
-        try {
-            while (ch.isWhitespace()) {  // scan past whitespace
 
-                ch = source!!.read()
+        while (ch.isWhitespace() && !startQuote) {  // scan past whitespace
+            if (source.length != position) {
+                if (ch.toString().matches("\n".toRegex())) lineNumber++
+
+                ch = source[position]
+                position++
+
                 Log.i("readNext", ch.toString())
 
-            }
-        } catch (e: java.lang.Exception) {
-            atEOF = true
-            return nextToken()
+            } else nextToken()
         }
 
-        startPosition = source!!.position
+        startPosition = position
         endPosition = startPosition - 1
-        lineNumber = source!!.lineno
 
-        if (Character.isJavaIdentifierStart(ch)) {
+        if (Character.isJavaIdentifierStart(ch) && !startQuote) {
             // return tokens for ids and reserved words, checking for appropriate REGEX pattern:
             var id = ""
             try {
                 do {
                     endPosition++
                     id += ch
-                    ch = source!!.read()
+                    ch = source[position]
+                    position++
                 } while (Character.isJavaIdentifierPart(ch))
             } catch (e: java.lang.Exception) {
                 atEOF = true
@@ -182,19 +186,21 @@ class Lexer(sourceFile: String) {
             } else newIdToken(id, startPosition, endPosition, lineNumber)
         }
 
-        if (Character.isDigit(ch)) {
+        if (Character.isDigit(ch) && !startQuote) {
             // return int and float tokens:
             var number = ""
             var isFloat = false
             try {
                 do {
                     //flags the presence of a possible float, avoids having multiple '.' in one number:
-                    if (ch == '.' && source!!.mightBeFloat()) {
+                    if (ch == '.') {
+
                         isFloat = true
                     }
                     endPosition++
                     number += ch
-                    ch = source!!.read()
+                    ch = source[position]
+                    position++
                     //This proceeds if ch is an integer, or the first decimal after the leading number:
                 } while (Character.isDigit(ch) || ch == '.' && !isFloat && endPosition >= startPosition)
             } catch (e: java.lang.Exception) {
@@ -206,23 +212,26 @@ class Lexer(sourceFile: String) {
                 newNumberToken(number, startPosition, endPosition, lineNumber)
             }
         }
-
-        if (ch == '"') {
-
+        if (startQuote && !endQuote) {
+            startQuote = false
+            endQuote = true
             try {
                 var id = ""
-                ch = source!!.read() // skip the quotes
-                startPosition++
+
                 do {
                     id += ch
-                    endPosition++
-                    ch = source!!.read()
+                    ch = source[position] // skip the quotes
+                    position++
+
+                    if (ch.toString().matches("\n".toRegex())) {
+                        lineNumber++
+                        return null
+                    }
                 } while (ch != '"')
-                ch = source!!.read()
-                endPosition++
 
                 return newStringToken(id, startPosition, endPosition, lineNumber)
             } catch (e: SyntaxError) {
+                Log.e("[LEXER ERROR]  ", e.toString())
                 throw e
             }
         }
@@ -230,13 +239,26 @@ class Lexer(sourceFile: String) {
         // At this point the only tokens to check for are one or two
         // characters; we must also check for comments that begin with
         // 2 //'s
-
         val charOld = "" + ch
         var op = charOld
         val sym: Symbol?
+
+        if (op.equals("\"")) {
+
+            if (!endQuote)
+                startQuote = true
+
+            else {
+                ch = source[position]
+                position++
+                return makeToken(op, startPosition, endPosition, lineNumber)
+            }
+        }
+
         try {
             endPosition++
-            ch = source!!.read()
+            ch = source[position]
+            position++
             op += ch
             // check if valid 2 char operator; if it's not in the symbol
             // table then don't insert it since we really have a one char
@@ -249,7 +271,8 @@ class Lexer(sourceFile: String) {
                 return makeToken(charOld, startPosition, endPosition, lineNumber)
             }
             endPosition++
-            ch = source!!.read()
+            ch = source[position]
+            position++
             return makeToken(op, startPosition, endPosition, lineNumber)
         } catch (e: java.lang.Exception) {
         }
@@ -262,7 +285,7 @@ class Lexer(sourceFile: String) {
 
     init {
         TokenType() // init token table
-        source = SourceReader(sourceFile)
-        ch = source?.read()!!
+        ch = source[position]
+        position++
     }
 }
