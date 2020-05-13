@@ -18,16 +18,20 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.example.icompile.R
-import com.example.icompile.core.Scanner
+import com.example.icompile.core.Scanner.isError
+import com.example.icompile.core.Scanner.reset
+import com.example.icompile.core.Scanner.setText
+import com.example.icompile.core.Scanner.skipExpVal
+import com.example.icompile.core.Scanner.skipFloat
+import com.example.icompile.core.Scanner.skipInt
+import com.example.icompile.core.Scanner.skipRegularExpression
 import com.example.icompile.data.InjectorUtils
 import com.example.icompile.databinding.ActivityMainBinding
 import com.example.icompile.syntaxhighlighting.definitions.KotlinHighlightingDefinition
 import com.example.icompile.ui.viewmodel.EditorViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import xyz.iridiumion.iridiumhighlightingeditor.highlightingdefinitions.definitions.JavaHighlightingDefinition
 
 
 class MainActivity : AppCompatActivity() {
@@ -37,8 +41,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var queryTextListener: SearchView.OnQueryTextListener
 
     private lateinit var viewModel: EditorViewModel
-
-    private val scanner = Scanner()
 
     lateinit var binding: ActivityMainBinding
 
@@ -63,10 +65,8 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProviders.of(this, factory)
             .get(EditorViewModel::class.java)
 
-        bindData()
-//        viewModel.bottomShortCut.observe(this, Observer { isVisible ->
-//            isVisible.let { binding.keyboardShortcut = it }
-//        })
+        val code = viewModel.getCode()
+        binding.code = code
 
     }
 
@@ -90,24 +90,14 @@ class MainActivity : AppCompatActivity() {
                     obtainUserPermissions()
 
                 } else {
-                    bindData()
+                    binding.code = viewModel.getCode()
+
                 }
             }
 
         }
     }
 
-    private fun bindData() {
-
-        viewModel.codeTextUi.observe(this, Observer {
-            it?.let { text ->
-                binding.code = text
-                scanner.setText(text)
-            }
-        })
-
-        viewModel.getCode()
-    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
 
@@ -176,7 +166,7 @@ class MainActivity : AppCompatActivity() {
                 // getContentType()
                 if (binding.content.text != null && !TextUtils.isEmpty(binding.content.text)) {
 
-                    val skipUnread = scanner.skipInt()
+                    setText(binding.content.text.toString())
 
                     val view = layoutInflater.inflate(R.layout.bottom_sheet_output, null)
                     val dialog = BottomSheetDialog(this, R.style.BottomSheetStyle)
@@ -184,7 +174,7 @@ class MainActivity : AppCompatActivity() {
 
                     // set the title of result
                     val title = view.findViewById<TextView>(R.id.title)
-                    if (scanner.isError) {
+                    if (isError) {
                         title.text = "ERROR LOG"
                         title.setTextColor(Color.parseColor("#A81A50"))
                     } else {
@@ -193,7 +183,7 @@ class MainActivity : AppCompatActivity() {
                     }
 
 
-                    view.findViewById<TextView>(R.id.output).text = skipUnread
+                    view.findViewById<TextView>(R.id.output).text = skipRegularExpression()
                     dialog.setContentView(view)
                     dialog.show()
                 }
@@ -202,14 +192,15 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.btn_save -> {
-                viewModel.setCode(binding.content.text.toString())
-                scanner.setText(binding.content.text.toString())
+                val code = binding.content.text.toString()
+                viewModel.setCode(code)
+
                 Toast.makeText(this, "Successfully saved!", Toast.LENGTH_LONG).show()
                 true
             }
 
             R.id.btn_stop -> {
-                scanner.reset()
+                reset()
                 Toast.makeText(this, "Application stopped!", Toast.LENGTH_LONG).show()
 
                 true

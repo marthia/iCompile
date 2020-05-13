@@ -1,10 +1,11 @@
 package com.example.icompile.core
 
 import android.graphics.Point
+import com.example.icompile.util.ScannerUtil
 import kotlin.properties.Delegates
 
 
-open class Scanner {
+object Scanner {
     var isError = false
     private lateinit var text: String
     private var position by Delegates.notNull<Int>()
@@ -67,27 +68,31 @@ open class Scanner {
     }
 
     fun getTokenInList(list: List<String>): Int {
-        var i = 0
+
         var keyword: String
 
         skipBlanks()
 
-        while (i < list.lastIndex) {
-            keyword = if (list[i][1] == '#')
-                list[i]
-            else
-                list[i]
+        repeat(list.size) {
 
-            when {
-                (keyword == "str") and isStr() -> return i
-                (keyword == "id") and isId() -> return i
-                (keyword == "int") and isInt() -> return i
-                (keyword == "float") and isInt() -> return i
+            keyword = list[it]
+
+            if (keyword.startsWith("#")) {
+                keyword = keyword.replace("#", "")
             }
-            i++
+
+            if (
+                keyword == "str" && isStr() ||
+                keyword == "float" && isFloat() ||
+                keyword == "int" && isInt() ||
+                keyword == "id" && isId() ||
+                isKeyword(keyword)
+
+            ) return it
         }
         return -1
     }
+
 
     // check if the character(s) at current position is
     // either of these main groups
@@ -99,7 +104,7 @@ open class Scanner {
         var p = position
         var state = 0
 
-        loop@ while (p < text.lastIndex) {
+        loop@ while (p <= text.lastIndex) {
             when (state) {
                 0 -> {
                     state = when {
@@ -129,7 +134,7 @@ open class Scanner {
         var p = position
         var state = 0
 
-        loop@ while (p < text.lastIndex) {
+        loop@ while (p <= text.lastIndex) {
             when (state) {
                 0 -> {
                     state = when {
@@ -201,7 +206,7 @@ open class Scanner {
         // skip all comments and whitespaces first
         skipBlanks()
 
-        loop@ while (p < text.lastIndex) {
+        loop@ while (p <= text.lastIndex) {
             when (state) {
                 0 -> {
                     state = when {
@@ -230,12 +235,12 @@ open class Scanner {
         // skip all comments and whitespaces first
         skipBlanks()
 
-        loop@ while (p < text.lastIndex) {
+        loop@ while (p <= text.lastIndex) {
             when (state) {
                 0 -> {
                     state = when {
                         text[p].toString() == "\'" -> 1
-                        text[p] == '#' -> 3
+                        ScannerUtil.containsSpecialCharacter(text[p].toString()) -> 3
                         else -> break@loop
 
                     }
@@ -250,7 +255,7 @@ open class Scanner {
                 2 -> {
                     state = when {
                         text[p].toString() == "\'" -> 1
-                        text[p] == '#' -> 3
+                        ScannerUtil.containsSpecialCharacter(text[p].toString()) -> 3
                         else -> break@loop
                     }
                 }
@@ -265,7 +270,7 @@ open class Scanner {
                     state = when {
                         text[p].isDigit() -> 4
                         text[p].toString() == "\'" -> 1
-                        text[p] == '#' -> 3
+                        ScannerUtil.containsSpecialCharacter(text[p].toString()) -> 3
                         else -> break@loop
                     }
                 }
@@ -280,7 +285,12 @@ open class Scanner {
         skipBlanks()
 
         newPos = position + keyword.length
-        return text.slice(IntRange(position, keyword.length)) == keyword
+        var result = false
+        try {
+            result = text.slice(IntRange(position, newPos - 1)) == keyword
+        } catch (e: Exception) {
+        }
+        return result
     }
     // end of checks
 
@@ -306,10 +316,10 @@ open class Scanner {
     fun skipStr(): String {
         return if (isStr()) getTextAndMoveTo(newPos)
         else
-            abortSyntax("Invalid Int")
+            abortSyntax("Invalid String")
     }
 
-    internal fun getToken(keyword: String): String {
+    fun getToken(keyword: String): String {
         return if (isKeyword(keyword)) {
             getTextAndMoveTo(newPos)
         } else abortSyntax("$keyword is expected")
@@ -319,7 +329,7 @@ open class Scanner {
         var p = position
         var state = 0
 
-        loop@ while (p < text.lastIndex) {
+        loop@ while (p <= text.lastIndex) {
             when (state) {
                 0 -> {
                     state = when {
@@ -367,8 +377,12 @@ open class Scanner {
     }
     // end of skips
 
-//    fun skipRegEx() {
-//        decisionHelper.skipOrs()
-//    }
+    fun skipExpVal(): String {
+        return SkipExpVal.execute()
+    }
+
+    fun skipRegularExpression(): String {
+        return SkipRegular.execute()
+    }
 
 }

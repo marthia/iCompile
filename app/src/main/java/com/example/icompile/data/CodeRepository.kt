@@ -8,13 +8,13 @@ import java.io.File
 
 class CodeRepository() {
 
-    fun getCode(): Observable<String> {
+    fun getCode(): String {
 
         val code = loadTextFromFile(
             FULL_PATH
         ).orEmpty()
 
-        return Observable.just(code)
+        return code
     }
 
 

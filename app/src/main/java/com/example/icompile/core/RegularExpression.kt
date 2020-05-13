@@ -1,6 +1,11 @@
 package com.example.icompile.core
 
-class RegularExpression : Scanner() {
+import com.example.icompile.core.Scanner.abortSyntax
+import com.example.icompile.core.Scanner.getToken
+import com.example.icompile.core.Scanner.getTokenInList
+import com.example.icompile.core.Scanner.isKeyword
+
+class RegularExpression {
 
     fun skipOrs() {
         skipAnds()

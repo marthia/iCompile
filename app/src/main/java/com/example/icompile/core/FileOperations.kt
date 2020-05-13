@@ -3,6 +3,7 @@ package com.example.icompile.core
 import android.util.Log
 import java.io.File
 import java.nio.charset.Charset
+import kotlin.String
 
 fun saveTextFile(
     text: String, path: String

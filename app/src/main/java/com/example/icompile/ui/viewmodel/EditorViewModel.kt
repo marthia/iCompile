@@ -1,5 +1,6 @@
 package com.example.icompile.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.icompile.data.CodeRepository
@@ -8,33 +9,14 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.internal.schedulers.IoScheduler
 
 class EditorViewModel(
-    val repository: CodeRepository
+    private val repository: CodeRepository
 ) : ViewModel() {
 
-    var codeTextUi = MutableLiveData<String>()
 
-    fun getCode() {
+    fun getCode(): String {
 
-        repository.getCode()
-            .observeOn(IoScheduler())
-            .subscribe(object : Observer<String> {
-                override fun onNext(t: String) {
+        return repository.getCode()
 
-                    codeTextUi.postValue(t)
-                }
-
-                override fun onComplete() {
-
-                }
-
-                override fun onSubscribe(d: Disposable) {
-
-                }
-
-                override fun onError(e: Throwable) {
-
-                }
-            })
     }
 
     fun setCode(text: String) {
