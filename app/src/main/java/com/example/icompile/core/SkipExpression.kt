@@ -1,13 +1,53 @@
 package com.example.icompile.core
 
-import com.example.icompile.core.Scanner.abortSyntax
-import com.example.icompile.core.Scanner.getToken
-import com.example.icompile.core.Scanner.getTokenInList
+import android.util.Log
+import com.example.icompile.data.Code
+import java.util.*
 
-class SkipExpression  {
+class SkipExpression(private val scanner: IScanner) : IParser{
 
-    fun execute() {
+    /*
+    * the main stack to hold the the generated intermediate code
+    *
+    * */
+    private val stack = Stack<String>()
+
+    /*
+    * the variable to keep track of code changes
+    *
+    * */
+    private var codes = ArrayList<Code>()
+
+    override fun execute(): String {
+        skipOr();
+
+        return if (stack.size != 0)
+            stack.pop() ?: "Error Parsing the phrase"
+        else "Error Parsing the phrase"
+    }
+
+    private fun skipOr() {
+        skipAnd()
+        skipOr1()
+    }
+
+    private fun skipAnd() {
         skipComp()
+        skipAnd1()
+    }
+
+    private fun skipAnd1() {
+        scanner.getToken("&&")
+        skipComp()
+        doAction(SemanticActionEnum.SA_AND, "&&")
+        skipAnd1()
+    }
+
+    private fun skipOr1() {
+        scanner.getToken("||")
+        skipAnd()
+        doAction(SemanticActionEnum.SA_OR, "||")
+        skipOr1()
     }
 
     private fun skipComp() {
@@ -16,42 +56,43 @@ class SkipExpression  {
     }
 
     private fun skipComp1() {
-        when (getTokenInList(arrayListOf("<=", ">=", "<>", "<", "=", ">"))) {
+        when (scanner.getTokenInList(arrayListOf(">=", "!=", "<=","==", "<", ">"))) {
 
             0 -> {
-                getToken("<=")
+                scanner.getToken(">=")
                 skipAdds()
-//            Result := Result + ['<='];
+                doAction(SemanticActionEnum.SA_GREAT_EQ, ">=");
             }
 
             1 -> {
-                getToken(">=")
+                scanner.getToken("!=")
                 skipAdds()
-//            Result := Result + ['<='];
+                doAction(SemanticActionEnum.SA_NOT_EQ, "!=");
             }
 
             2 -> {
-                getToken("<>")
+                scanner.getToken("<=")
                 skipAdds()
-//            Result := Result + ['<='];
+                doAction(SemanticActionEnum.SA_LESS_EQ, "<=");
             }
 
             3 -> {
-                getToken("<")
+                scanner.getToken("==")
                 skipAdds()
-//            Result := Result + ['<='];
+                doAction(SemanticActionEnum.SA_EQUAL, "==");
             }
 
             4 -> {
-                getToken("=")
+                scanner.getToken("<")
                 skipAdds()
-//            Result := Result + ['<='];
+                doAction(SemanticActionEnum.SA_LESS, "<");
+
             }
 
             5 -> {
-                getToken(">")
+                scanner.getToken(">")
                 skipAdds()
-//            Result := Result + ['<='];
+                doAction(SemanticActionEnum.SA_GREAT, ">");
             }
             else -> {
             } // nothing
@@ -65,26 +106,19 @@ class SkipExpression  {
     }
 
     private fun skipAdds1() {
-        when (getTokenInList(arrayListOf("+", "-", "or"))) {
+        when (scanner.getTokenInList(arrayListOf("+", "-"))) {
 
             0 -> {
-                getToken("+")
+                scanner.getToken("+")
                 skipMuls()
-//              Result := Result + ['+'];
+                doAction(SemanticActionEnum.SA_ADD, "+");
                 skipAdds1()
             }
 
             1 -> {
-                getToken("-")
+                scanner.getToken("-")
                 skipMuls()
-//              Result := Result + ['+'];
-                skipAdds1()
-            }
-
-            2 -> {
-                getToken("or")
-                skipMuls()
-//              Result := Result + ['+'];
+                doAction(SemanticActionEnum.SA_SUB, "-");
                 skipAdds1()
             }
             else -> {
@@ -99,24 +133,18 @@ class SkipExpression  {
     }
 
     fun skipMuls1() {
-        when (getTokenInList(arrayListOf("*", "/", "and"))) {
+        when (scanner.getTokenInList(arrayListOf("*", "/"))) {
 
             0 -> {
-                getToken("*")
+                scanner.getToken("*")
                 skipPrimary()
-//                Result := Result + ['*'];
+                doAction(SemanticActionEnum.SA_MUL, "*");
                 skipMuls1()
             }
             1 -> {
-                getToken("/")
+                scanner.getToken("/")
                 skipPrimary()
-//                Result := Result + ['*'];
-                skipMuls1()
-            }
-            2 -> {
-                getToken("and")
-                skipPrimary()
-//                Result := Result + ['*'];
+                doAction(SemanticActionEnum.SA_DIV, "/");
                 skipMuls1()
             }
             else -> {
@@ -124,37 +152,91 @@ class SkipExpression  {
         }
     }
 
+    @Throws(SyntaxError::class)
     private fun skipPrimary() {
-        when (getTokenInList(arrayListOf("not", "-", "(", "#id", "#str", "#float"))) {
+        when (scanner.getTokenInList(arrayListOf("!", "-", "(", "#id", "#str", "#float"))) {
             0 -> {
-                getToken("not")
+                scanner.getToken("!")
                 skipPrimary()
-//                Result := Result + ['not'];
+                doAction(SemanticActionEnum.SA_NOT, "!");
             }
 
             1 -> {
-                getToken("-")
+                scanner.getToken("-")
                 skipPrimary()
-//                Result := Result + ['not'];
+                doAction(SemanticActionEnum.SA_NEG, "-")
             }
             2 -> {
-                getToken("(")
-                skipComp()
-                getToken(")")
+                scanner.getToken("(")
+                skipOr()
+                scanner.getToken(")")
             }
             3 -> {
-//                Result := Result + [SkipId];
+                doAction(SemanticActionEnum.SA_ID, scanner.skipId())
             }
             4 -> {
-//                Result := Result + [SkipPStr];
+                doAction(SemanticActionEnum.SA_STR, scanner.skipStr())
             }
+
             5 -> {
-//                Result := Result + [SkipFloat.ToString];
+                doAction(SemanticActionEnum.SA_NUM, scanner.skipFloat())
             }
             else ->
-                abortSyntax(" not, - , ( , id , str , float  Expected")
+                throw SyntaxError(" not, - , ( , id , str , num  Expected")
         }
 
+    }
+
+    private fun doAction(action: SemanticActionEnum, tokenVal: String = "") {
+        var l = ""
+        var r = ""
+        var temp = ""
+
+
+        when (action) {
+
+            SemanticActionEnum.SA_ID, SemanticActionEnum.SA_STR, SemanticActionEnum.SA_NUM -> {
+                stack.push(tokenVal);
+            }
+
+            SemanticActionEnum.SA_ADD, SemanticActionEnum.SA_SUB, SemanticActionEnum.SA_MUL,
+            SemanticActionEnum.SA_DIV, SemanticActionEnum.SA_OR, SemanticActionEnum.SA_AND,
+            SemanticActionEnum.SA_LESS, SemanticActionEnum.SA_LESS_EQ, SemanticActionEnum.SA_EQUAL,
+            SemanticActionEnum.SA_GREAT, SemanticActionEnum.SA_GREAT_EQ, SemanticActionEnum.SA_NOT_EQ,
+            SemanticActionEnum.SA_STAR
+
+            -> {
+
+                r = stack.pop()
+                l = stack.pop()
+                temp = UUID.randomUUID().toString()
+                addCode(tokenVal, l, r, temp);
+                stack.push(temp);
+            }
+
+            SemanticActionEnum.SA_NEG, SemanticActionEnum.SA_NOT -> {
+                temp = UUID.randomUUID().toString()
+                r = stack.pop()
+                addCode(tokenVal, r, "-", temp);
+                stack.push(temp);
+            }
+
+            else -> {
+            } // ignore
+
+        }
+        Log.i("doAction", stack.toString())
+    }
+
+    private fun addCode(newOp: String, a1: String, a2: String, target: String) {
+        codes.add(
+            Code(
+                operation = newOp,
+                leftOperand = a1,
+                rightOperand = a2,
+                target = target
+            )
+        )
     }
 
 }

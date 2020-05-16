@@ -14,7 +14,7 @@ import com.example.icompile.Constants.COMMENT_COLOR
 import com.example.icompile.Constants.KEYWORD_COLOR
 import com.example.icompile.Constants.KOTLIN_KEYWORDS
 import com.example.icompile.R
-@Deprecated("This class cannot provide syntax highlighting functionality")
+
 class EditorView : AppCompatEditText {
 
     // using `@JvmOverloads` generates unwanted bugs and styling issues
@@ -91,37 +91,37 @@ class EditorView : AppCompatEditText {
 
     }
 
-   override fun onTextChanged(
-        text: CharSequence?,
-        start: Int,
-        lengthBefore: Int,
-        lengthAfter: Int
-    ) {
-        super.onTextChanged(text, start, lengthBefore, lengthAfter)
-                text?.forEach {
-                    KOTLIN_KEYWORDS.forEach {
-                        val index = text.indexOf(it, start)
-                        if (index != -1) {
-                            getText()?.setSpan(
-                                ForegroundColorSpan(Color.parseColor(KEYWORD_COLOR)),
-                                index,
-                                index + it.length,
-                                Spannable.SPAN_INTERMEDIATE
-                            )
-                        }
-                    }
-                }
-
-        val index = getText().toString().indexOf(COMMENT)
-        if (index != -1) {
-            getText()?.setSpan(
-                ForegroundColorSpan(Color.parseColor(COMMENT_COLOR)),
-                index,
-                getText()!!.indexOf("\n", index),
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-        }
-    }
+//   override fun onTextChanged(
+//        text: CharSequence?,
+//        start: Int,
+//        lengthBefore: Int,
+//        lengthAfter: Int
+//    ) {
+//        super.onTextChanged(text, start, lengthBefore, lengthAfter)
+//                text?.forEach {
+//                    KOTLIN_KEYWORDS.forEach {
+//                        val index = text.indexOf(it, start)
+//                        if (index != -1) {
+//                            getText()?.setSpan(
+//                                ForegroundColorSpan(Color.parseColor(KEYWORD_COLOR)),
+//                                index,
+//                                index + it.length,
+//                                Spannable.SPAN_INTERMEDIATE
+//                            )
+//                        }
+//                    }
+//                }
+//
+//        val index = getText().toString().indexOf(COMMENT)
+//        if (index != -1) {
+//            getText()?.setSpan(
+//                ForegroundColorSpan(Color.parseColor(COMMENT_COLOR)),
+//                index,
+//                getText()!!.indexOf("\n", index),
+//                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+//            )
+//        }
+//    }
 
     /**
      * Compute the line to highlight based on selection
@@ -154,6 +154,18 @@ class EditorView : AppCompatEditText {
 
             mHighlightedLine = line
         }
+    }
+    fun insert(s: String) {
+        val start = selectionStart
+        val end = selectionEnd
+
+        text?.replace(
+            Math.min(start, end),
+            Math.max(start, end),
+            s,
+            0,
+            1
+        )
     }
 
 }

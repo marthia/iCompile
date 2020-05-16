@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_round_corners"
+    android:gravity="center"
+    android:orientation="vertical">
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Choose the context scheme"
+        android:layout_margin="8dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_margin="8dp"
+        android:background="#CCCCCC" />
+
+    <TextView
+        android:id="@+id/arithmetic_btn"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/button_background"
+        android:elevation="4dp"
+        android:fontFamily="@font/josefine_sans_reg"
+        android:gravity="center"
+        android:text="Arithmetic"
+        android:textColor="@color/colorAccent"
+        android:textSize="18dp" />
+
+    <TextView
+        android:id="@+id/parenthesis_depth_btn"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/button_background"
+        android:elevation="4dp"
+        android:fontFamily="@font/josefine_sans_reg"
+        android:gravity="center"
+        android:text="Parenthesis Depth"
+        android:textColor="@color/colorAccent"
+        android:textSize="18dp" />
+
+    <TextView
+        android:id="@+id/regular_expression_btn"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/button_background"
+        android:elevation="4dp"
+        android:fontFamily="@font/josefine_sans_reg"
+        android:gravity="center"
+        android:text="Regular Expression"
+        android:textColor="@color/colorAccent"
+        android:textSize="18dp" />
+
+    <TextView
+        android:id="@+id/expressions_btn"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/button_background"
+        android:elevation="4dp"
+        android:fontFamily="@font/josefine_sans_reg"
+        android:gravity="center"
+        android:text="Expressions IC"
+        android:textColor="@color/colorAccent"
+        android:textSize="18dp" />
+</LinearLayout>

@@ -8,16 +8,17 @@ import kotlin.String
 fun saveTextFile(
     text: String, path: String
 ): String {
-    try {
+    return try {
 
         File(path).apply {
             writeText(text, Charset.defaultCharset())
         }
 
-        return "Successfully saved"
+        "Successfully saved"
+
     } catch (e: Exception) {
         Log.i("saveTextFile", e.printStackTrace().toString())
-        return "Could not Save changes. see logs for more info"
+        "Could not Save changes. see logs for more info"
     }
 }
 

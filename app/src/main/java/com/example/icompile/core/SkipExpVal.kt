@@ -1,22 +1,26 @@
 package com.example.icompile.core
 
 import android.util.Log
-import com.example.icompile.core.Scanner.abortSyntax
-import com.example.icompile.core.Scanner.getToken
-import com.example.icompile.core.Scanner.getTokenInList
-import com.example.icompile.core.Scanner.skipFloat
-import com.example.icompile.core.Scanner.skipInt
 import java.util.*
 
 
-object SkipExpVal {
+class SkipExpVal(private val scanner: IScanner) : IParser{
+
+    /*
+   * the main stack to hold the the generated intermediate code
+   *
+   * */
     private val stack = Stack<String>()
 
-    fun execute(): String {
-        skipA()
-        return if (stack.size  != 0)
-            stack.pop() ?: "Could not parse the phrase"
-        else "Could not parse the phrase"
+    @Throws(SyntaxError::class)
+    override fun execute(): String {
+
+            skipA()
+
+        if (stack.isNotEmpty()) return stack.pop()
+
+
+        throw SyntaxError(scanner.getErrorInfo())
     }
 
     private fun skipA() {
@@ -26,16 +30,16 @@ object SkipExpVal {
     }
 
     private fun skipA1() {
-        when (getTokenInList(arrayListOf("+", "-"))) {
+        when (scanner.getTokenInList(arrayListOf("+", "-"))) {
             0 -> {
-                getToken("+")
+                scanner.getToken("+")
                 skipM()
                 doAction(SemanticActionEnum.SA_ADD)
                 skipA1()
             }
 
             1 -> {
-                getToken("-")
+                scanner.getToken("-")
                 skipM()
                 doAction(SemanticActionEnum.SA_SUB)
                 skipA1()
@@ -54,15 +58,15 @@ object SkipExpVal {
     }
 
     private fun skipM1() {
-        when (getTokenInList(arrayListOf("*", "/"))) {
+        when (scanner.getTokenInList(arrayListOf("*", "/"))) {
             0 -> {
-                getToken("*")
+                scanner.getToken("*")
                 skipP()
                 doAction(SemanticActionEnum.SA_MUL)
                 skipM1()
             }
             1 -> {
-                getToken("/")
+                scanner.getToken("/")
                 skipP()
                 doAction(SemanticActionEnum.SA_DIV)
             }
@@ -73,25 +77,25 @@ object SkipExpVal {
     }
 
     private fun skipP() {
-        when (getTokenInList(arrayListOf("-", "(", "#int"))) {
+        when (scanner.getTokenInList(arrayListOf("-", "(", "#float"))) {
 
             0 -> {
-                getToken("-")
+                scanner.getToken("-")
                 skipP()
                 doAction(SemanticActionEnum.SA_NEG)
             }
 
             1 -> {
-                getToken("(")
+                scanner.getToken("(")
                 skipA()
-                getToken(")")
+                scanner.getToken(")")
             }
 
             2 -> {
-                doAction(SemanticActionEnum.SA_NUM, skipInt())
+                doAction(SemanticActionEnum.SA_NUM, scanner.skipFloat())
             }
             else -> {
-                abortSyntax("Expression element expected : - , ( , num")
+                throw SyntaxError(scanner.getErrorInfo("Expression element expected : - , ( , num"))
             }
         }
 

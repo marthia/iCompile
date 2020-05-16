@@ -1,17 +1,17 @@
 package com.example.icompile.core
 
 import android.util.Log
-import com.example.icompile.core.Scanner.abortSyntax
-import com.example.icompile.core.Scanner.getToken
-import com.example.icompile.core.Scanner.getTokenInList
-import com.example.icompile.core.Scanner.isKeyword
-import com.example.icompile.core.Scanner.skipId
 import java.util.*
 
-object SkipRegular {
+class SkipRegular(private val scanner: IScanner) : IParser {
+
+    /*
+   * the main stack to hold the the generated intermediate code
+   *
+   * */
     private val stack = Stack<String>()
 
-    fun execute(): String {
+    override fun execute(): String {
         skipR()
         return if (stack.size != 0)
             stack.pop() ?: "Couldn't resolve the provided code!"
@@ -24,8 +24,8 @@ object SkipRegular {
     }
 
     private fun skipR1() {
-        if (isKeyword("|")) {
-            getToken("|");
+        if (scanner.isKeyword("|")) {
+            scanner.getToken("|");
             skipN()
             doAction(SemanticActionEnum.SA_OR, "|");
             skipR1()
@@ -38,8 +38,8 @@ object SkipRegular {
     }
 
     private fun skipN1() {
-        if (isKeyword(".")) {
-            getToken(".")
+        if (scanner.isKeyword(".")) {
+            scanner.getToken(".")
             skipS()
             doAction(SemanticActionEnum.SA_DOT, ".")
             skipN1()
@@ -52,24 +52,24 @@ object SkipRegular {
     }
 
     private fun skipS1() {
-        if (isKeyword("*")) {
-            getToken("*")
+        if (scanner.isKeyword("*")) {
+            scanner.getToken("*")
             doAction(SemanticActionEnum.SA_STAR)
             skipS1()
         }
     }
 
     private fun skipP() {
-        when (getTokenInList(arrayListOf("(", "#id"))) {
+        when (scanner.getTokenInList(arrayListOf("(", "#id"))) {
             0 -> {
-                getToken("(")
+                scanner.getToken("(")
                 skipR()
-                getToken(")")
+                scanner.getToken(")")
             }
             1 -> {
-                doAction(SemanticActionEnum.SA_ID, skipId())
+                doAction(SemanticActionEnum.SA_ID, scanner.skipId())
             }
-            else -> abortSyntax("Regular element expected: ( , id")
+            else -> throw SyntaxError("Regular element expected: ( , id")
         }
     }
 

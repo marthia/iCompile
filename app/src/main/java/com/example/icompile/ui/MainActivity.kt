@@ -5,6 +5,7 @@ import android.app.SearchManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
@@ -20,16 +21,9 @@ import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProviders
 import com.example.icompile.R
-import com.example.icompile.core.Scanner.isError
-import com.example.icompile.core.Scanner.reset
-import com.example.icompile.core.Scanner.setText
-import com.example.icompile.core.Scanner.skipExpVal
-import com.example.icompile.core.Scanner.skipFloat
-import com.example.icompile.core.Scanner.skipInt
-import com.example.icompile.core.Scanner.skipRegularExpression
+import com.example.icompile.core.*
 import com.example.icompile.data.InjectorUtils
 import com.example.icompile.databinding.ActivityMainBinding
-import com.example.icompile.syntaxhighlighting.definitions.KotlinHighlightingDefinition
 import com.example.icompile.ui.viewmodel.EditorViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
@@ -43,6 +37,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: EditorViewModel
 
     lateinit var binding: ActivityMainBinding
+
+    private val scanner = Scanner()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -116,7 +112,7 @@ class MainActivity : AppCompatActivity() {
 
                 override fun onQueryTextSubmit(query: String): Boolean {
 
-                    var indexOfQuery = binding.content.text?.indexOf(query, 0);
+                    var indexOfQuery = binding.content.text?.indexOf(query, 0)
                     val wordToSpan: Spannable = SpannableString(binding.content.text)
 
                     var ofs = 0
@@ -125,7 +121,7 @@ class MainActivity : AppCompatActivity() {
 
                         indexOfQuery = binding.content.text?.indexOf(query, ofs)
                         if (indexOfQuery == -1)
-                            break;
+                            break
                         else {
 
                             wordToSpan.setSpan(
@@ -133,7 +129,7 @@ class MainActivity : AppCompatActivity() {
                                 indexOfQuery!!,
                                 indexOfQuery + query.length,
                                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                            );
+                            )
                             binding.content.setText(wordToSpan, TextView.BufferType.SPANNABLE)
                         }
 
@@ -163,31 +159,7 @@ class MainActivity : AppCompatActivity() {
 
         return when (item.itemId) {
             R.id.btn_run -> {
-                // getContentType()
-                if (binding.content.text != null && !TextUtils.isEmpty(binding.content.text)) {
-
-                    setText(binding.content.text.toString())
-
-                    val view = layoutInflater.inflate(R.layout.bottom_sheet_output, null)
-                    val dialog = BottomSheetDialog(this, R.style.BottomSheetStyle)
-
-
-                    // set the title of result
-                    val title = view.findViewById<TextView>(R.id.title)
-                    if (isError) {
-                        title.text = "ERROR LOG"
-                        title.setTextColor(Color.parseColor("#A81A50"))
-                    } else {
-                        title.text = "Output"
-                        title.setTextColor(Color.parseColor("#46A37E"))
-                    }
-
-
-                    view.findViewById<TextView>(R.id.output).text = skipRegularExpression()
-                    dialog.setContentView(view)
-                    dialog.show()
-                }
-
+                showExecutionSchemeDialog()
                 true
             }
 
@@ -200,7 +172,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.btn_stop -> {
-                reset()
+                scanner.reset()
                 Toast.makeText(this, "Application stopped!", Toast.LENGTH_LONG).show()
 
                 true
@@ -209,9 +181,55 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun bindViews() {
+    private fun showExecutionSchemeDialog() {
+        val dialog = ExecutionSchemeDialog(this, object : OnExecutionResponse {
+            override fun doAction(scheme: ExecutionScheme) {
+                run(scheme)
+            }
+        })
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-        binding.content.loadHighlightingDefinition(KotlinHighlightingDefinition())
+        dialog.show()
+    }
+
+    private fun run(executionScheme: ExecutionScheme) {
+        if (binding.content.text != null && !TextUtils.isEmpty(binding.content.text)) {
+
+            scanner.setText(binding.content.text.toString())
+
+            val view = layoutInflater.inflate(R.layout.bottom_sheet_output, null)
+            val dialog = BottomSheetDialog(this, R.style.BottomSheetStyle)
+
+            val ar = Parser(SkipExpVal(scanner))
+            val de = Parser(SkipDepth(scanner))
+            val re = Parser(SkipRegular(scanner))
+            val ex = Parser(SkipExpression(scanner))
+
+            view.findViewById<TextView>(R.id.output).text =
+
+                when (executionScheme) {
+                    ExecutionScheme.ARITHMETIC -> ar.execute()
+                    ExecutionScheme.DEPTH -> de.execute()
+                    ExecutionScheme.REGULAR -> re.execute()
+                    ExecutionScheme.EXPRESSIONS_IC -> ex.execute()
+                }
+            dialog.setContentView(view)
+
+            // set the title of result
+            val title = view.findViewById<TextView>(R.id.title)
+            if (scanner.isError) {
+                title.text = "ERROR LOG"
+                title.setTextColor(Color.parseColor("#A81A50"))
+            } else {
+                title.text = "Output"
+                title.setTextColor(Color.parseColor("#46A37E"))
+            }
+
+            dialog.show()
+        }
+    }
+
+    private fun bindViews() {
 
         binding.btnTab.setOnClickListener {
             binding.content.insert("\t")
@@ -271,20 +289,6 @@ class MainActivity : AppCompatActivity() {
             binding.content.insert("?")
         }
 
-    }
-
-    fun findKeywordAtLine(text: String?): Int {
-        val wholeText = binding.content.text.toString()
-        val listOfLines = wholeText.split("\n")
-
-        for ((index, line) in listOfLines.withIndex()) {
-
-            if (text.let { line.contains(it.toString()) }) {
-                return index
-
-            }
-        }
-        return -1
     }
 
 }

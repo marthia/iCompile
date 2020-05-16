@@ -1,30 +1,40 @@
 package com.example.icompile.core
 
-import com.example.icompile.core.Scanner.abortSyntax
-import com.example.icompile.core.Scanner.getToken
-import com.example.icompile.core.Scanner.getTokenInList
-import com.example.icompile.core.Scanner.isKeyword
 import java.util.*
 import kotlin.math.max
 
-class SkipDepth {
+class SkipDepth (private val scanner: IScanner): IParser{
+
+    /*
+   * the main stack to hold the the generated intermediate code
+   *
+   * */
     private val stack = Stack<Int>()
 
+    override fun execute(): String {
+        skipS()
+
+        return if (stack.size  != 0)
+            stack.pop().toString()
+        else "Error Parsing the phrase"
+    }
+
+    @Throws(SyntaxError::class)
     private fun skipS() {
-        when (getTokenInList(arrayListOf("(", "a"))) {
+        when (scanner.getTokenInList(arrayListOf("(", "a"))) {
 
             0 -> {
-                getToken("(")
+                scanner.getToken("(")
                 skipL()
-                getToken(")")
-                this.doAction(SemanticActionEnum.SA_INC)
+                scanner.getToken(")")
+                doAction(SemanticActionEnum.SA_INC)
             }
             1 -> {
-                getToken("a");
-                this.doAction(SemanticActionEnum.SA_ZERO)
+                scanner.getToken("a");
+                doAction(SemanticActionEnum.SA_ZERO)
             }
             else -> {
-                abortSyntax("( , a Expected")
+                throw SyntaxError("( , a Expected")
             }
         }
     }
@@ -35,8 +45,8 @@ class SkipDepth {
     }
 
     private fun skipL1() {
-        if (isKeyword(",")) {
-            getToken(",")
+        if (scanner.isKeyword(",")) {
+            scanner.getToken(",")
             skipS();
             doAction(SemanticActionEnum.SA_MAX);
             skipL1()
@@ -57,4 +67,5 @@ class SkipDepth {
             else -> {} // ignore
         }
     }
+
 }

@@ -1,25 +1,39 @@
 package com.example.icompile.core
 
 import android.graphics.Point
-import com.example.icompile.util.ScannerUtil
+import android.util.Log
 import kotlin.properties.Delegates
 
 
-object Scanner {
+class Scanner : IScanner {
+
     var isError = false
+
     private lateinit var text: String
+
     private var position by Delegates.notNull<Int>()
+
     private var newPos by Delegates.notNull<Int>()
+
     private lateinit var location: Point
 
-    fun abortSyntax(s: String): String {
+    override fun getErrorInfo(message: String): String {
 
         isError = true
 
-        return "$s \n" +
-                "Line = ${currentLine()} \n" +
-                "Character = ${text[position]} \n " +
-                "at position ${location.x} , ${location.y}"
+        val v = if (position >= text.length)
+            "unexpected end of the file"
+        else text[position].toString()
+
+        val result =
+                    "LINE:  ${currentLine()} \n\n" +
+                    "CHARACTER:  $v \n\n " +
+                    "POSITION:  ${location.x} , ${location.y}\n\n" +
+                    "MESSAGE:  $message"
+
+
+        Log.e("AbortSyntax", result)
+        return result
     }
 
     private fun clear() {
@@ -41,7 +55,6 @@ object Scanner {
         isError = false
         location = Point(0, 0)
     }
-
 
     // get text at current line
     private fun currentLine(): String {
@@ -67,7 +80,7 @@ object Scanner {
         return stringBuilder.toString()
     }
 
-    fun getTokenInList(list: List<String>): Int {
+    override fun getTokenInList(list: List<String>): Int {
 
         var keyword: String
 
@@ -83,8 +96,8 @@ object Scanner {
 
             if (
                 keyword == "str" && isStr() ||
-                keyword == "float" && isFloat() ||
                 keyword == "int" && isInt() ||
+                keyword == "float" && isFloat() ||
                 keyword == "id" && isId() ||
                 isKeyword(keyword)
 
@@ -93,9 +106,11 @@ object Scanner {
         return -1
     }
 
-
-    // check if the character(s) at current position is
-    // either of these main groups
+    /*
+    * check if the character(s) at current position is
+    * either of these main groups
+    * @return true if the current token is Int
+    * */
     private fun isInt(): Boolean {
 
         // skip all comments and whitespaces first
@@ -170,15 +185,13 @@ object Scanner {
                         else -> break@loop
                     }
                 }
-
                 5 -> {
                     state = when {
-                        text[p].isDigit() -> 7
                         text[p] == '+' || text == "-" -> 6
+                        text[p].isDigit() -> 7
                         else -> break@loop
                     }
                 }
-
                 6 -> {
                     state = when {
                         text[p].isDigit() -> 7
@@ -196,7 +209,7 @@ object Scanner {
         }
 
         newPos = p
-        return state == 2 or 4 or 7
+        return arrayOf(2, 4, 7).contains(state)
     }
 
     private fun isId(): Boolean {
@@ -239,49 +252,37 @@ object Scanner {
             when (state) {
                 0 -> {
                     state = when {
-                        text[p].toString() == "\'" -> 1
-                        ScannerUtil.containsSpecialCharacter(text[p].toString()) -> 3
+                        text[p].toString() == "\"" -> 1
                         else -> break@loop
-
                     }
                 }
+
                 1 -> {
                     state = when {
-                        text[p].toString() == "\'" -> 2
-                        text[p] == '\n' -> break@loop
+                        text[p].toString() == "\\" -> 2
+                        text[p].toString() == "\"" -> 3
+                        text[p].equals("\n") -> break@loop
                         else -> 1
                     }
                 }
+
                 2 -> {
                     state = when {
-                        text[p].toString() == "\'" -> 1
-                        ScannerUtil.containsSpecialCharacter(text[p].toString()) -> 3
-                        else -> break@loop
+                        text[p].equals("\n") -> break@loop
+                        else -> 1
                     }
                 }
                 3 -> {
-                    state = when {
-                        text[p].isDigit() -> 4
-                        else -> break@loop
-                    }
-                }
-
-                4 -> {
-                    state = when {
-                        text[p].isDigit() -> 4
-                        text[p].toString() == "\'" -> 1
-                        ScannerUtil.containsSpecialCharacter(text[p].toString()) -> 3
-                        else -> break@loop
-                    }
+                    break@loop
                 }
             }
             p++
         }
         newPos = p
-        return state == 2 or 4
+        return state == 3
     }
 
-    fun isKeyword(keyword: String): Boolean {
+    override fun isKeyword(keyword: String): Boolean {
         skipBlanks()
 
         newPos = position + keyword.length
@@ -292,39 +293,45 @@ object Scanner {
         }
         return result
     }
-    // end of checks
 
     // get item and move position to the beginning of
     // the next item
-    fun skipInt(): String {
+    @Throws(SyntaxError::class)
+    override fun skipInt(): String {
         return if (isInt()) getTextAndMoveTo(newPos)
-        else abortSyntax("Invalid Int")
+        else throw SyntaxError("Invalid Int")
     }
 
-    fun skipFloat(): String {
+    @Throws(SyntaxError::class)
+    override fun skipFloat(): String {
         return if (isFloat())
             getTextAndMoveTo(newPos)
         else
-            abortSyntax("invalid float")
+            throw SyntaxError("invalid float")
     }
 
-    fun skipId(): String {
-        return if (isId()) return getTextAndMoveTo(newPos)
-        else abortSyntax("Invalid Id")
+    @Throws(SyntaxError::class)
+    override fun skipId(): String {
+
+        if (isId()) return getTextAndMoveTo(newPos)
+        else throw SyntaxError("Invalid Id")
     }
 
-    fun skipStr(): String {
+    @Throws(SyntaxError::class)
+    override fun skipStr(): String {
         return if (isStr()) getTextAndMoveTo(newPos)
         else
-            abortSyntax("Invalid String")
+            throw SyntaxError("Invalid String")
     }
 
-    fun getToken(keyword: String): String {
+    @Throws(SyntaxError::class)
+    override fun getToken(keyword: String): String {
         return if (isKeyword(keyword)) {
             getTextAndMoveTo(newPos)
-        } else abortSyntax("$keyword is expected")
+        } else throw SyntaxError("$keyword is expected")
     }
 
+    @Throws(SyntaxError::class)
     private fun skipBlanks(): String {
         var p = position
         var state = 0
@@ -372,17 +379,10 @@ object Scanner {
         return when (state) {
             0 -> getTextAndMoveTo(p)
             1 -> getTextAndMoveTo(p - 1)
-            else -> abortSyntax("Invalid Comment")
+            else -> throw SyntaxError("Invalid Comment")
         }
     }
+
     // end of skips
-
-    fun skipExpVal(): String {
-        return SkipExpVal.execute()
-    }
-
-    fun skipRegularExpression(): String {
-        return SkipRegular.execute()
-    }
 
 }

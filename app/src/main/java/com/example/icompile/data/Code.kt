@@ -1,4 +1,12 @@
 package com.example.icompile.data
 
-class Code {
-}
+data class Code(
+
+    private val leftOperand: String = "",
+
+    private val rightOperand: String = "",
+
+    private val operation: String = "",
+
+    private val target: String = ""
+)
