@@ -13,9 +13,10 @@ class SkipRegular(private val scanner: IScanner) : IParser {
 
     override fun execute(): String {
         skipR()
-        return if (stack.size != 0)
-            stack.pop() ?: "Couldn't resolve the provided code!"
-        else "Couldn't resolve the provided code!"
+
+        if (stack.isNotEmpty()) return stack.pop()
+
+        throw SyntaxError(scanner.getErrorInfo())
     }
 
     private fun skipR() {

@@ -5,7 +5,7 @@
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@color/colorAccent3</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="searchViewStyle">@style/searchViewStyle</item>
     </style>
@@ -60,6 +60,11 @@
     <style name="titleStyle">
         <item name="android:fontFamily">@font/aller_display</item>
         <item name="android:textSize">20sp</item>
+    </style>
+
+
+    <style name="textStyle">
+        <item name="fontFamily">@font/jet_mono</item>
     </style>
 
 </resources>

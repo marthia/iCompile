@@ -3,10 +3,10 @@ package com.example.icompile.ui
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.example.icompile.R
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import me.marthia.icompile.auth.SignUpActivity
 
 class SplashScreen : AppCompatActivity() {
 
@@ -14,9 +14,13 @@ class SplashScreen : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash_screen)
 
+
+        // Hide status bar
+        window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         Handler().postDelayed({
 
-            startActivity(Intent(this@SplashScreen, MainActivity::class.java))
+            startActivity(Intent(this@SplashScreen, SignUpActivity::class.java))
             finish()
 
         }, 2000)

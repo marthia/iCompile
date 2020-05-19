@@ -7,4 +7,5 @@
     <string name="btn_stop_title">stop</string>
     <string name="btn_run_title">run application</string>
     <string name="btn_find_title">find</string>
+    <string name="btn_logout_title">logout</string>
 </resources>

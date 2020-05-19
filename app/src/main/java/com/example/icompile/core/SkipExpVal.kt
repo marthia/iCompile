@@ -19,7 +19,6 @@ class SkipExpVal(private val scanner: IScanner) : IParser{
 
         if (stack.isNotEmpty()) return stack.pop()
 
-
         throw SyntaxError(scanner.getErrorInfo())
     }
 

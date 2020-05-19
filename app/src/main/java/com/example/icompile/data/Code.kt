@@ -9,4 +9,12 @@ data class Code(
     private val operation: String = "",
 
     private val target: String = ""
-)
+
+) {
+    override fun toString(): String {
+        return "\nOperation : $operation \n" +
+                "Left Operand : $leftOperand \n" +
+                "Right Operand : $rightOperand \n" +
+                "Target : $target"
+    }
+}

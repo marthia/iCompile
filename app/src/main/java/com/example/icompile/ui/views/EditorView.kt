@@ -35,7 +35,7 @@ class EditorView : AppCompatEditText {
     private val mPaintHighlight = Paint().apply {
         isAntiAlias = false
         style = Paint.Style.FILL
-        color = Color.parseColor("#24b89300")
+        color = Color.parseColor("#45e7e8d1") // line color
     }
     private var mHighlightedLine = -1
     private var mHighlightStart = -1
@@ -44,7 +44,7 @@ class EditorView : AppCompatEditText {
     private val paint: Paint = Paint().apply {
         isAntiAlias = true
         style = Paint.Style.FILL
-        color = Color.parseColor("#646464")
+        color = Color.parseColor("#000000") // line number color
         textSize =
             resources.getDimensionPixelSize(R.dimen.editor_line_number_text_size)
                 .toFloat()

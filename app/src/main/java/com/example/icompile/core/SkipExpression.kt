@@ -6,10 +6,12 @@ import java.util.*
 
 class SkipExpression(private val scanner: IScanner) : IParser{
 
+    private var tempId = 0
+
     /*
-    * the main stack to hold the the generated intermediate code
-    *
-    * */
+        * the main stack to hold the the generated intermediate code
+        *
+        * */
     private val stack = Stack<String>()
 
     /*
@@ -19,11 +21,29 @@ class SkipExpression(private val scanner: IScanner) : IParser{
     private var codes = ArrayList<Code>()
 
     override fun execute(): String {
+
         skipOr();
 
-        return if (stack.size != 0)
-            stack.pop() ?: "Error Parsing the phrase"
-        else "Error Parsing the phrase"
+        val result =StringBuilder()
+
+        repeat(times = codes.size) {
+
+            result.append("\n")
+
+            result.append("[ ")
+
+            result.append(it)
+
+            result.append("] = ( ")
+
+            result.append(codes[it].toString())
+
+            result.append(" )")
+        }
+
+        return result.toString()
+
+        throw SyntaxError(scanner.getErrorInfo())
     }
 
     private fun skipOr() {
@@ -37,17 +57,28 @@ class SkipExpression(private val scanner: IScanner) : IParser{
     }
 
     private fun skipAnd1() {
-        scanner.getToken("&&")
-        skipComp()
-        doAction(SemanticActionEnum.SA_AND, "&&")
-        skipAnd1()
+        when (scanner.getTokenInList(arrayListOf("&&"))) {
+            0 -> {
+                scanner.getToken("&&")
+                skipComp ()
+                doAction (SemanticActionEnum.SA_AND, "&&")
+                skipAnd1()
+            }
+            else -> {} // nothing
+        }
     }
 
     private fun skipOr1() {
-        scanner.getToken("||")
-        skipAnd()
-        doAction(SemanticActionEnum.SA_OR, "||")
-        skipOr1()
+
+        when (scanner.getTokenInList(arrayListOf("||"))) {
+            0 -> {
+                scanner.getToken("||")
+                skipAnd()
+                doAction(SemanticActionEnum.SA_OR, "||")
+                skipOr1()
+            }
+            else -> {} // nothing
+        }
     }
 
     private fun skipComp() {
@@ -209,13 +240,13 @@ class SkipExpression(private val scanner: IScanner) : IParser{
 
                 r = stack.pop()
                 l = stack.pop()
-                temp = UUID.randomUUID().toString()
+                temp = generateTemp()
                 addCode(tokenVal, l, r, temp);
                 stack.push(temp);
             }
 
             SemanticActionEnum.SA_NEG, SemanticActionEnum.SA_NOT -> {
-                temp = UUID.randomUUID().toString()
+                temp = generateTemp()
                 r = stack.pop()
                 addCode(tokenVal, r, "-", temp);
                 stack.push(temp);
@@ -226,6 +257,11 @@ class SkipExpression(private val scanner: IScanner) : IParser{
 
         }
         Log.i("doAction", stack.toString())
+        Log.i("code", codes.toString())
+    }
+
+    private fun generateTemp(): String {
+        return "T" + tempId++
     }
 
     private fun addCode(newOp: String, a1: String, a2: String, target: String) {

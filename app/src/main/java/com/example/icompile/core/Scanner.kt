@@ -21,12 +21,13 @@ class Scanner : IScanner {
 
         isError = true
 
+        // if the unexpected character is located at the of the file show appropriate error message
         val v = if (position >= text.length)
             "unexpected end of the file"
         else text[position].toString()
 
         val result =
-                    "LINE:  ${currentLine()} \n\n" +
+            "LINE:  ${currentLine()} \n\n" +
                     "CHARACTER:  $v \n\n " +
                     "POSITION:  ${location.x} , ${location.y}\n\n" +
                     "MESSAGE:  $message"
@@ -106,11 +107,13 @@ class Scanner : IScanner {
         return -1
     }
 
-    /*
-    * check if the character(s) at current position is
-    * either of these main groups
-    * @return true if the current token is Int
-    * */
+    /**
+     * check if the character(s) at current position is
+     * either of these main groups
+     *
+     * @return true if the current token is Int
+     *
+     * */
     private fun isInt(): Boolean {
 
         // skip all comments and whitespaces first
@@ -295,7 +298,7 @@ class Scanner : IScanner {
     }
 
     // get item and move position to the beginning of
-    // the next item
+    // the next character
     @Throws(SyntaxError::class)
     override fun skipInt(): String {
         return if (isInt()) getTextAndMoveTo(newPos)

@@ -32,7 +32,7 @@
         android:fontFamily="@font/josefine_sans_reg"
         android:gravity="center"
         android:text="Arithmetic"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/colorAccent3"
         android:textSize="18dp" />
 
     <TextView
@@ -47,7 +47,7 @@
         android:fontFamily="@font/josefine_sans_reg"
         android:gravity="center"
         android:text="Parenthesis Depth"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/colorAccent3"
         android:textSize="18dp" />
 
     <TextView
@@ -62,7 +62,7 @@
         android:fontFamily="@font/josefine_sans_reg"
         android:gravity="center"
         android:text="Regular Expression"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/colorAccent3"
         android:textSize="18dp" />
 
     <TextView
@@ -78,6 +78,6 @@
         android:fontFamily="@font/josefine_sans_reg"
         android:gravity="center"
         android:text="Expressions IC"
-        android:textColor="@color/colorAccent"
+        android:textColor="@color/colorAccent3"
         android:textSize="18dp" />
 </LinearLayout>

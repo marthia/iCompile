@@ -3,6 +3,7 @@ package com.example.icompile.ui
 import android.Manifest
 import android.app.SearchManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -26,6 +27,9 @@ import com.example.icompile.data.InjectorUtils
 import com.example.icompile.databinding.ActivityMainBinding
 import com.example.icompile.ui.viewmodel.EditorViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import me.marthia.icompile.auth.SignUpActivity
+import me.marthia.icompile.auth.UserBll
+import me.marthia.icompile.util.AppDatabase
 
 
 class MainActivity : AppCompatActivity() {
@@ -46,6 +50,10 @@ class MainActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(
             this, R.layout.activity_main
         )
+
+        val sharedPreferences = getSharedPreferences("Auth", Context.MODE_PRIVATE)
+
+        sharedPreferences.edit().putBoolean("isFirst", false).apply()
 
         setSupportActionBar(binding.toolbar)
 
@@ -177,8 +185,25 @@ class MainActivity : AppCompatActivity() {
 
                 true
             }
+            R.id.btn_logout -> {
+                logout()
+                startActivity(Intent(this, SignUpActivity::class.java))
+                finish()
+                true
+            }
             else -> false
         }
+    }
+
+    private fun logout() {
+        val preferences = getSharedPreferences("Auth", Context.MODE_PRIVATE)
+        preferences.edit().putBoolean("isFirst", true).apply()
+        val currentUser = preferences.getString("currentUser", "")
+        val database = AppDatabase.getInstance(this)
+
+        val userBll = UserBll(database.userDao())
+        userBll.logout(currentUser!!)
+        preferences.edit().putString("currentUser", "").apply()
     }
 
     private fun showExecutionSchemeDialog() {

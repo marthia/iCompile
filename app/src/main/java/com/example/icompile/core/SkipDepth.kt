@@ -14,9 +14,9 @@ class SkipDepth (private val scanner: IScanner): IParser{
     override fun execute(): String {
         skipS()
 
-        return if (stack.size  != 0)
-            stack.pop().toString()
-        else "Error Parsing the phrase"
+        if (stack.isNotEmpty()) return stack.pop().toString()
+
+        throw SyntaxError(scanner.getErrorInfo())
     }
 
     @Throws(SyntaxError::class)
