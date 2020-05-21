@@ -1,10 +1,14 @@
-package com.example.icompile.core
+package com.example.icompile.core.parsing
 
 import android.util.Log
+import com.example.icompile.core.lexing.IScanner
+import com.example.icompile.core.SemanticActionEnum
+import com.example.icompile.core.SyntaxError
 import com.example.icompile.data.Code
 import java.util.*
 
-class SkipExpression(private val scanner: IScanner) : IParser{
+class SkipExpression(private val scanner: IScanner) :
+    IParser {
 
     private var tempId = 0
 
@@ -30,15 +34,15 @@ class SkipExpression(private val scanner: IScanner) : IParser{
 
             result.append("\n")
 
-            result.append("[ ")
+            result.append("at index: [ ")
 
             result.append(it)
 
-            result.append("] = ( ")
+            result.append(" ] = ( ")
 
             result.append(codes[it].toString())
 
-            result.append(" )")
+            result.append(" )\n")
         }
 
         return result.toString()

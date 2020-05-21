@@ -2,6 +2,8 @@ package me.marthia.icompile.auth
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -17,6 +19,8 @@ class SignUpActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
+        setColorBackground()
 
         if (checkIfFirstTime()) {
 
@@ -60,12 +64,6 @@ class SignUpActivity : AppCompatActivity() {
         }
     }
 
-    private fun getUser() {
-        val database = AppDatabase.getInstance(this)
-        val userBll = UserBll(database.userDao())
-
-    }
-
     private fun checkIfFirstTime(): Boolean {
 
         val sharedPreferences = getSharedPreferences("Auth", Context.MODE_PRIVATE)
@@ -78,5 +76,17 @@ class SignUpActivity : AppCompatActivity() {
         sharedPreferences.edit().putBoolean("isFirst", true).commit()
         startActivity(Intent(this, SignUpActivity::class.java))
         finish()
+    }
+
+    private fun setColorBackground() {
+        val greenGradient = GradientDrawable(
+            GradientDrawable.Orientation.LEFT_RIGHT,
+            intArrayOf(
+                Color.parseColor("#a7beae"),
+                Color.parseColor("#CDE0C9"),
+                Color.parseColor("#E0ECDE")
+            )
+        )
+        background.background = greenGradient
     }
 }

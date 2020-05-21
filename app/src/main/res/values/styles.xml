@@ -8,6 +8,7 @@
         <item name="colorAccent">@color/colorAccent3</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="searchViewStyle">@style/searchViewStyle</item>
+
     </style>
 
     <style name="AppTheme.NoActionBar">

@@ -7,6 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
@@ -22,11 +23,13 @@ import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProviders
 import com.example.icompile.R
-import com.example.icompile.core.*
+import com.example.icompile.core.lexing.Scanner
+import com.example.icompile.core.parsing.*
 import com.example.icompile.data.InjectorUtils
 import com.example.icompile.databinding.ActivityMainBinding
 import com.example.icompile.ui.viewmodel.EditorViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import kotlinx.android.synthetic.main.activity_main.*
 import me.marthia.icompile.auth.SignUpActivity
 import me.marthia.icompile.auth.UserBll
 import me.marthia.icompile.util.AppDatabase
@@ -50,6 +53,8 @@ class MainActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(
             this, R.layout.activity_main
         )
+
+        setColorBackground()
 
         val sharedPreferences = getSharedPreferences("Auth", Context.MODE_PRIVATE)
 
@@ -225,10 +230,13 @@ class MainActivity : AppCompatActivity() {
             val view = layoutInflater.inflate(R.layout.bottom_sheet_output, null)
             val dialog = BottomSheetDialog(this, R.style.BottomSheetStyle)
 
-            val ar = Parser(SkipExpVal(scanner))
+            val ar =
+                Parser(SkipExpVal(scanner))
             val de = Parser(SkipDepth(scanner))
-            val re = Parser(SkipRegular(scanner))
-            val ex = Parser(SkipExpression(scanner))
+            val re =
+                Parser(SkipRegular(scanner))
+            val ex =
+                Parser(SkipExpression(scanner))
 
             view.findViewById<TextView>(R.id.output).text =
 
@@ -314,6 +322,20 @@ class MainActivity : AppCompatActivity() {
             binding.content.insert("?")
         }
 
+    }
+
+    private fun setColorBackground() {
+        val greenGradient = GradientDrawable(
+            GradientDrawable.Orientation.LEFT_RIGHT,
+            intArrayOf(
+                Color.parseColor("#a7beae"),
+                Color.parseColor("#CDE0C9"),
+                Color.parseColor("#E0ECDE")
+            )
+        )
+       background.background = greenGradient
+        toolbar.background = greenGradient
+        content.background = greenGradient
     }
 
 }

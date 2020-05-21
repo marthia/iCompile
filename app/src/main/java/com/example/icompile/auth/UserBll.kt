@@ -1,7 +1,7 @@
 package me.marthia.icompile.auth
 
 import androidx.lifecycle.LiveData
-import com.example.icompile.ui.runOnIoThread
+import com.example.icompile.data.runOnIoThread
 
 class UserBll(
     private val dao: UserDao

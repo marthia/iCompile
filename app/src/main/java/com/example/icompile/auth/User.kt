@@ -9,5 +9,4 @@ class User(
     @PrimaryKey
     var username: String,
     var password: String
-) {
-}
+)

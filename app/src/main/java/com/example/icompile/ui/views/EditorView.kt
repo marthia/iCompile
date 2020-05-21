@@ -5,14 +5,8 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
-import android.text.Spannable
-import android.text.style.ForegroundColorSpan
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatEditText
-import com.example.icompile.Constants.COMMENT
-import com.example.icompile.Constants.COMMENT_COLOR
-import com.example.icompile.Constants.KEYWORD_COLOR
-import com.example.icompile.Constants.KOTLIN_KEYWORDS
 import com.example.icompile.R
 
 class EditorView : AppCompatEditText {
@@ -74,54 +68,22 @@ class EditorView : AppCompatEditText {
         computeLineHighlight()
 
         for (i in 0 until lineCount) {
-            paint.let {
-                canvas.drawText(
-                    String.format(" %3d ", i + 1), rect.left.toFloat(),
-                    baseline.toFloat(), it
-                )
-            }
+//            paint.let {
+//                canvas.drawText(
+//                    String.format(" %3d ", i + 1), rect.left.toFloat(),
+//                    baseline.toFloat(), it
+//                )
+//            }
             if ((i == mHighlightedLine)) {
                 getLineBounds(mHighlightedLine, mLineBounds)
                 mLineBounds.left = 0 // make sure the whole gets highlighted
                 canvas.drawRect(mLineBounds, mPaintHighlight);
             }
 
-            baseline += lineHeight
+//            baseline += lineHeight
         }
 
     }
-
-//   override fun onTextChanged(
-//        text: CharSequence?,
-//        start: Int,
-//        lengthBefore: Int,
-//        lengthAfter: Int
-//    ) {
-//        super.onTextChanged(text, start, lengthBefore, lengthAfter)
-//                text?.forEach {
-//                    KOTLIN_KEYWORDS.forEach {
-//                        val index = text.indexOf(it, start)
-//                        if (index != -1) {
-//                            getText()?.setSpan(
-//                                ForegroundColorSpan(Color.parseColor(KEYWORD_COLOR)),
-//                                index,
-//                                index + it.length,
-//                                Spannable.SPAN_INTERMEDIATE
-//                            )
-//                        }
-//                    }
-//                }
-//
-//        val index = getText().toString().indexOf(COMMENT)
-//        if (index != -1) {
-//            getText()?.setSpan(
-//                ForegroundColorSpan(Color.parseColor(COMMENT_COLOR)),
-//                index,
-//                getText()!!.indexOf("\n", index),
-//                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-//            )
-//        }
-//    }
 
     /**
      * Compute the line to highlight based on selection
@@ -155,13 +117,14 @@ class EditorView : AppCompatEditText {
             mHighlightedLine = line
         }
     }
+
     fun insert(s: String) {
         val start = selectionStart
         val end = selectionEnd
 
         text?.replace(
-            Math.min(start, end),
-            Math.max(start, end),
+            start.coerceAtMost(end),
+            start.coerceAtLeast(end),
             s,
             0,
             1

@@ -11,6 +11,7 @@
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/background"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -25,7 +26,6 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/colorAccent5"
                 app:buttonGravity="center_vertical"
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
 
@@ -34,7 +34,6 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/colorAccent5"
             app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
             tools:context=".ui.MainActivity">
 
@@ -66,9 +65,8 @@
                         android:id="@+id/content"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/background_edit_text"
                         android:elevation="1dp"
-                        android:fontFamily="@font/inconsolata_regular"
+                        android:fontFamily="@font/jet_mono"
                         android:hint="@string/editor_hint"
                         android:imeOptions="flagNoFullscreen|flagNoEnterAction"
                         android:inputType="textMultiLine|textNoSuggestions"
@@ -77,6 +75,7 @@
                         android:nestedScrollingEnabled="true"
                         android:overScrollMode="ifContentScrolls"
                         android:paddingStart="32dp"
+                        android:textStyle="bold"
                         android:paddingEnd="16dp"
                         android:paddingBottom="16dp"
                         android:scrollbarAlwaysDrawHorizontalTrack="true"
@@ -84,7 +83,7 @@
                         android:selectAllOnFocus="false"
                         android:text="@{code}"
                         android:textColor="#000000"
-                        android:textSize="18sp" />
+                        android:textSize="20sp" />
                 </HorizontalScrollView>
             </ScrollView>
 

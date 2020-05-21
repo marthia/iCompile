@@ -1,4 +1,4 @@
-package com.example.icompile.core
+package com.example.icompile.core.lexing
 
 interface IScanner {
 

@@ -1,9 +1,13 @@
-package com.example.icompile.core
+package com.example.icompile.core.parsing
 
 import android.util.Log
+import com.example.icompile.core.lexing.IScanner
+import com.example.icompile.core.SemanticActionEnum
+import com.example.icompile.core.SyntaxError
 import java.util.*
 
-class SkipRegular(private val scanner: IScanner) : IParser {
+class SkipRegular(private val scanner: IScanner) :
+    IParser {
 
     /*
    * the main stack to hold the the generated intermediate code

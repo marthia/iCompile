@@ -1,7 +1,8 @@
-package com.example.icompile.core
+package com.example.icompile.core.lexing
 
 import android.graphics.Point
 import android.util.Log
+import com.example.icompile.core.SyntaxError
 import kotlin.properties.Delegates
 
 

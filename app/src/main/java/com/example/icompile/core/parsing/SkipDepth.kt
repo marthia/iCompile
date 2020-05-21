@@ -1,9 +1,13 @@
-package com.example.icompile.core
+package com.example.icompile.core.parsing
 
+import com.example.icompile.core.lexing.IScanner
+import com.example.icompile.core.SemanticActionEnum
+import com.example.icompile.core.SyntaxError
 import java.util.*
 import kotlin.math.max
 
-class SkipDepth (private val scanner: IScanner): IParser{
+class SkipDepth (private val scanner: IScanner):
+    IParser {
 
     /*
    * the main stack to hold the the generated intermediate code

@@ -1,10 +1,14 @@
-package com.example.icompile.core
+package com.example.icompile.core.parsing
 
 import android.util.Log
+import com.example.icompile.core.lexing.IScanner
+import com.example.icompile.core.SemanticActionEnum
+import com.example.icompile.core.SyntaxError
 import java.util.*
 
 
-class SkipExpVal(private val scanner: IScanner) : IParser{
+class SkipExpVal(private val scanner: IScanner) :
+    IParser {
 
     /*
    * the main stack to hold the the generated intermediate code
@@ -94,7 +98,11 @@ class SkipExpVal(private val scanner: IScanner) : IParser{
                 doAction(SemanticActionEnum.SA_NUM, scanner.skipFloat())
             }
             else -> {
-                throw SyntaxError(scanner.getErrorInfo("Expression element expected : - , ( , num"))
+                throw SyntaxError(
+                    scanner.getErrorInfo(
+                        "Expression element expected : - , ( , num"
+                    )
+                )
             }
         }
 

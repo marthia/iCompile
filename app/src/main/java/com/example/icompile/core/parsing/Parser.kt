@@ -1,4 +1,6 @@
-package com.example.icompile.core
+package com.example.icompile.core.parsing
+
+import com.example.icompile.core.SyntaxError
 
 class Parser(private val parse: IParser) {
 
