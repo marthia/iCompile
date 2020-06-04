@@ -30,7 +30,6 @@ import com.example.icompile.databinding.ActivityMainBinding
 import com.example.icompile.ui.viewmodel.EditorViewModel
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.android.synthetic.main.activity_main.*
-import me.marthia.icompile.auth.SignUpActivity
 import me.marthia.icompile.auth.UserBll
 import me.marthia.icompile.util.AppDatabase
 
@@ -230,34 +229,32 @@ class MainActivity : AppCompatActivity() {
             val view = layoutInflater.inflate(R.layout.bottom_sheet_output, null)
             val dialog = BottomSheetDialog(this, R.style.BottomSheetStyle)
 
-            val ar =
-                Parser(SkipExpVal(scanner))
-            val de = Parser(SkipDepth(scanner))
-            val re =
-                Parser(SkipRegular(scanner))
-            val ex =
-                Parser(SkipExpression(scanner))
+            val arithmetic = Parser(SkipExpVal(scanner))
+            val parenthesisDepth = Parser(SkipDepth(scanner))
+            val regexConversion = Parser(SkipRegular(scanner))
+            val expression = Parser(SkipExpression(scanner))
 
             view.findViewById<TextView>(R.id.output).text =
 
                 when (executionScheme) {
-                    ExecutionScheme.ARITHMETIC -> ar.execute()
-                    ExecutionScheme.DEPTH -> de.execute()
-                    ExecutionScheme.REGULAR -> re.execute()
-                    ExecutionScheme.EXPRESSIONS_IC -> ex.execute()
+                    ExecutionScheme.ARITHMETIC -> arithmetic.execute()
+                    ExecutionScheme.DEPTH -> parenthesisDepth.execute()
+                    ExecutionScheme.REGULAR -> regexConversion.execute()
+                    ExecutionScheme.EXPRESSIONS_IC -> expression.execute()
                 }
             dialog.setContentView(view)
 
             // set the title of result
             val title = view.findViewById<TextView>(R.id.title)
+
             if (scanner.isError) {
                 title.text = "ERROR LOG"
                 title.setTextColor(Color.parseColor("#A81A50"))
+
             } else {
                 title.text = "Output"
                 title.setTextColor(Color.parseColor("#46A37E"))
             }
-
             dialog.show()
         }
     }
@@ -335,7 +332,6 @@ class MainActivity : AppCompatActivity() {
         )
        background.background = greenGradient
         toolbar.background = greenGradient
-        content.background = greenGradient
     }
 
 }

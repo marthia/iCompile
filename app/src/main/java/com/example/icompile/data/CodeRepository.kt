@@ -3,7 +3,6 @@ package com.example.icompile.data
 import android.os.Environment
 import com.example.icompile.core.loadTextFromFile
 import com.example.icompile.core.saveTextFile
-import io.reactivex.Observable
 import java.io.File
 
 class CodeRepository() {
@@ -20,6 +19,7 @@ class CodeRepository() {
 
     fun saveCode(text: String): String {
         // create our own folder for any file : could be asked from user in future
+
         if (!File("${Environment.getExternalStorageDirectory()}${CODE_TEXT_FOLDER_PATH}").exists()) {
 
 
@@ -41,6 +41,7 @@ class CodeRepository() {
         private const val CODE_TEXT_FOLDER_PATH = "/iCompile"
         private var FULL_PATH =
             "${Environment.getExternalStorageDirectory()}${CODE_TEXT_FOLDER_PATH}${CODE_TEXT_FILE}"
+
         // For Singleton instantiation
         @Volatile
         private var instance: CodeRepository? = null

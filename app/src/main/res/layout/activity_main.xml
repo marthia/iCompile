@@ -66,16 +66,16 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:elevation="1dp"
-                        android:fontFamily="@font/jet_mono"
                         android:hint="@string/editor_hint"
                         android:imeOptions="flagNoFullscreen|flagNoEnterAction"
                         android:inputType="textMultiLine|textNoSuggestions"
                         android:minWidth="450dp"
                         android:minHeight="80dp"
+                        style="@style/EditTextViewStyle.CodeViewStyle"
                         android:nestedScrollingEnabled="true"
                         android:overScrollMode="ifContentScrolls"
                         android:paddingStart="32dp"
-                        android:textStyle="bold"
+                        android:background="@android:color/transparent"
                         android:paddingEnd="16dp"
                         android:paddingBottom="16dp"
                         android:scrollbarAlwaysDrawHorizontalTrack="true"
@@ -83,7 +83,7 @@
                         android:selectAllOnFocus="false"
                         android:text="@{code}"
                         android:textColor="#000000"
-                        android:textSize="20sp" />
+                        android:textSize="18sp" />
                 </HorizontalScrollView>
             </ScrollView>
 

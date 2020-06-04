@@ -1,9 +1,9 @@
 package com.example.icompile.core.parsing
 
 import android.util.Log
-import com.example.icompile.core.lexing.IScanner
 import com.example.icompile.core.SemanticActionEnum
 import com.example.icompile.core.SyntaxError
+import com.example.icompile.core.lexing.IScanner
 import com.example.icompile.data.Code
 import java.util.*
 
@@ -24,30 +24,21 @@ class SkipExpression(private val scanner: IScanner) :
     * */
     private var codes = ArrayList<Code>()
 
+
     override fun execute(): String {
 
         skipOr();
 
-        val result =StringBuilder()
+        val result = StringBuilder()
 
         repeat(times = codes.size) {
 
-            result.append("\n")
-
-            result.append("at index: [ ")
-
-            result.append(it)
-
-            result.append(" ] = ( ")
-
             result.append(codes[it].toString())
 
-            result.append(" )\n")
+            result.append("\n")
         }
 
         return result.toString()
-
-        throw SyntaxError(scanner.getErrorInfo())
     }
 
     private fun skipOr() {
@@ -61,27 +52,23 @@ class SkipExpression(private val scanner: IScanner) :
     }
 
     private fun skipAnd1() {
-        when (scanner.getTokenInList(arrayListOf("&&"))) {
-            0 -> {
-                scanner.getToken("&&")
-                skipComp ()
-                doAction (SemanticActionEnum.SA_AND, "&&")
-                skipAnd1()
-            }
-            else -> {} // nothing
+        if (scanner.isKeyword("&&")) {
+
+            scanner.getToken("&&")
+            skipComp()
+            doAction(SemanticActionEnum.SA_AND, "&&")
+            skipAnd1()
         }
     }
 
     private fun skipOr1() {
 
-        when (scanner.getTokenInList(arrayListOf("||"))) {
-            0 -> {
-                scanner.getToken("||")
-                skipAnd()
-                doAction(SemanticActionEnum.SA_OR, "||")
-                skipOr1()
-            }
-            else -> {} // nothing
+        if (scanner.isKeyword("||")) {
+
+            scanner.getToken("||")
+            skipAnd()
+            doAction(SemanticActionEnum.SA_OR, "||")
+            skipOr1()
         }
     }
 
@@ -91,7 +78,7 @@ class SkipExpression(private val scanner: IScanner) :
     }
 
     private fun skipComp1() {
-        when (scanner.getTokenInList(arrayListOf(">=", "!=", "<=","==", "<", ">"))) {
+        when (scanner.getTokenInList(arrayListOf(">=", "!=", "<=", "==", "<", ">"))) {
 
             0 -> {
                 scanner.getToken(">=")
@@ -223,9 +210,9 @@ class SkipExpression(private val scanner: IScanner) :
     }
 
     private fun doAction(action: SemanticActionEnum, tokenVal: String = "") {
-        var l = ""
-        var r = ""
-        var temp = ""
+        var l: String
+        var r: String
+        var temp: String
 
 
         when (action) {

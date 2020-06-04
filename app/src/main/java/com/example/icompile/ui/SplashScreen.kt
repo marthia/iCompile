@@ -6,7 +6,6 @@ import android.os.Handler
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.example.icompile.R
-import me.marthia.icompile.auth.SignUpActivity
 
 class SplashScreen : AppCompatActivity() {
 
@@ -20,7 +19,7 @@ class SplashScreen : AppCompatActivity() {
 
         Handler().postDelayed({
 
-            startActivity(Intent(this@SplashScreen, MainActivity::class.java))
+            startActivity(Intent(this@SplashScreen, SignUpActivity::class.java))
             finish()
 
         }, 2000)

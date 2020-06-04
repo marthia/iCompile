@@ -27,7 +27,7 @@
             android:name=".ui.MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="me.marthia.icompile.auth.SignUpActivity"
+            android:name=".ui.SignUpActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity

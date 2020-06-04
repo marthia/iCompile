@@ -1,4 +1,4 @@
-package me.marthia.icompile.auth
+package com.example.icompile.ui
 
 import android.content.Context
 import android.content.Intent
@@ -10,8 +10,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.example.icompile.R
-import com.example.icompile.ui.MainActivity
 import kotlinx.android.synthetic.main.activity_login.*
+import me.marthia.icompile.auth.UserBll
 import me.marthia.icompile.util.AppDatabase
 
 class SignUpActivity : AppCompatActivity() {

@@ -8,7 +8,9 @@
         <item name="colorAccent">@color/colorAccent3</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="searchViewStyle">@style/searchViewStyle</item>
-
+        <item name="android:textViewStyle">@style/TextViewStyle</item>
+        <item name="buttonStyle">@style/ButtonViewStyle</item>
+        <item name="editTextStyle">@style/EditTextViewStyle</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -63,9 +65,27 @@
         <item name="android:textSize">20sp</item>
     </style>
 
-
-    <style name="textStyle">
-        <item name="fontFamily">@font/jet_mono</item>
+    <style name="TextViewStyle">
+        <item name="fontFamily">@font/josefine_sans_reg</item>
+        <item name="android:textSize">16dp</item>
     </style>
+
+    <style name="ButtonViewStyle">
+        <item name="fontFamily">@font/josefine_sans_reg</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textSize">17dp</item>
+    </style>
+    <style name="EditTextViewStyle" parent="Widget.AppCompat.EditText">
+        <item name="fontFamily">@font/josefine_sans_reg</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="EditTextViewStyle.CodeViewStyle">
+        <item name="android:textAlignment">viewStart</item>
+    </style>
+
 
 </resources>

@@ -34,16 +34,6 @@ class EditorView : AppCompatEditText {
     private var mHighlightedLine = -1
     private var mHighlightStart = -1
 
-    private val rect = Rect()
-    private val paint: Paint = Paint().apply {
-        isAntiAlias = true
-        style = Paint.Style.FILL
-        color = Color.parseColor("#000000") // line number color
-        textSize =
-            resources.getDimensionPixelSize(R.dimen.editor_line_number_text_size)
-                .toFloat()
-    }
-
     private fun init(context: Context, attrs: AttributeSet?, defStyleAttr: Int) {
         // Load the styled attributes and set their properties
         val attributes =
@@ -62,25 +52,15 @@ class EditorView : AppCompatEditText {
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-
-        var baseline = baseline
-
         computeLineHighlight()
 
         for (i in 0 until lineCount) {
-//            paint.let {
-//                canvas.drawText(
-//                    String.format(" %3d ", i + 1), rect.left.toFloat(),
-//                    baseline.toFloat(), it
-//                )
-//            }
             if ((i == mHighlightedLine)) {
                 getLineBounds(mHighlightedLine, mLineBounds)
                 mLineBounds.left = 0 // make sure the whole gets highlighted
                 canvas.drawRect(mLineBounds, mPaintHighlight);
             }
 
-//            baseline += lineHeight
         }
 
     }
