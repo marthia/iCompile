@@ -303,7 +303,7 @@ class Scanner : IScanner {
     @Throws(SyntaxError::class)
     override fun skipInt(): String {
         return if (isInt()) getTextAndMoveTo(newPos)
-        else throw SyntaxError("Invalid Int")
+        else throw SyntaxError(getErrorInfo("Invalid Int"))
     }
 
     @Throws(SyntaxError::class)
@@ -311,28 +311,28 @@ class Scanner : IScanner {
         return if (isFloat())
             getTextAndMoveTo(newPos)
         else
-            throw SyntaxError("invalid float")
+            throw SyntaxError(getErrorInfo("invalid float"))
     }
 
     @Throws(SyntaxError::class)
     override fun skipId(): String {
 
         if (isId()) return getTextAndMoveTo(newPos)
-        else throw SyntaxError("Invalid Id")
+        else throw SyntaxError(getErrorInfo("Invalid Id"))
     }
 
     @Throws(SyntaxError::class)
     override fun skipStr(): String {
         return if (isStr()) getTextAndMoveTo(newPos)
         else
-            throw SyntaxError("Invalid String")
+            throw SyntaxError(getErrorInfo("Invalid String"))
     }
 
     @Throws(SyntaxError::class)
     override fun getToken(keyword: String): String {
         return if (isKeyword(keyword)) {
             getTextAndMoveTo(newPos)
-        } else throw SyntaxError("$keyword is expected")
+        } else throw SyntaxError(getErrorInfo("$keyword is expected"))
     }
 
     @Throws(SyntaxError::class)
@@ -383,7 +383,7 @@ class Scanner : IScanner {
         return when (state) {
             0 -> getTextAndMoveTo(p)
             1 -> getTextAndMoveTo(p - 1)
-            else -> throw SyntaxError("Invalid Comment")
+            else -> throw SyntaxError(getErrorInfo("Invalid Comment"))
         }
     }
 

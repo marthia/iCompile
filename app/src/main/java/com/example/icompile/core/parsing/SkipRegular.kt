@@ -74,7 +74,7 @@ class SkipRegular(private val scanner: IScanner) :
             1 -> {
                 doAction(SemanticActionEnum.SA_ID, scanner.skipId())
             }
-            else -> throw SyntaxError("Regular element expected: ( , id")
+            else -> throw SyntaxError(scanner.getErrorInfo("Regular element expected: ( , id"))
         }
     }
 

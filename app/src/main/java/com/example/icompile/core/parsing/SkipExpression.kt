@@ -154,7 +154,7 @@ class SkipExpression(private val scanner: IScanner) :
         skipMuls1()
     }
 
-    fun skipMuls1() {
+    private fun skipMuls1() {
         when (scanner.getTokenInList(arrayListOf("*", "/"))) {
 
             0 -> {
@@ -204,7 +204,7 @@ class SkipExpression(private val scanner: IScanner) :
                 doAction(SemanticActionEnum.SA_NUM, scanner.skipFloat())
             }
             else ->
-                throw SyntaxError(" not, - , ( , id , str , num  Expected")
+                throw SyntaxError(scanner.getErrorInfo(" not, - , ( , id , str , num  Expected"))
         }
 
     }
